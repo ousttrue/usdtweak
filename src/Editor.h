@@ -16,11 +16,17 @@ PXR_NAMESPACE_USING_DIRECTIVE
 using DockShowFunction = std::function<void(bool *p_open)>;
 
 class Dock {
+    std::string _name;
     DockShowFunction _callback;
     bool *_p_open = nullptr;
 
   public:
-    Dock(bool *p_open, const DockShowFunction &callback) : _callback(callback), _p_open(p_open) { assert(_p_open); }
+    Dock(const std::string &name, bool *p_open, const DockShowFunction &callback)
+        : _name(name), _callback(callback), _p_open(p_open) {
+        assert(_p_open);
+    }
+
+    void menu_item();
 
     void show() {
         if (*_p_open) {
@@ -80,15 +86,8 @@ class Editor {
     /// Render the hydra viewport
     void HydraRender();
 
-    ///
-    /// Drawing functions for the main editor
-    ///
-
     /// Draw the menu bar
     void DrawMainMenuBar();
-
-    /// Draw the UI
-    void Draw();
 
   public:
     /// Handle drag and drop from external applications

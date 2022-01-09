@@ -31,6 +31,8 @@
 #include "Shortcuts.h"
 #include <GLFW/glfw3.h>
 
+void Dock::menu_item() { ImGui::MenuItem(_name.c_str(), nullptr, _p_open); }
+
 // There is a bug in the Undo/Redo when reloading certain layers, here is the post
 // that explains how to debug the issue:
 // Reloading model.stage doesn't work but reloading stage separately does
@@ -216,7 +218,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     // setup docks
-    _docks.push_back(Dock(&_settings._showViewport, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Stage viewport", &_settings._showViewport, [self = this](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
             self->_viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
@@ -226,7 +228,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
     }));
     _dock_viewport = &_docks.back();
 
-    _docks.push_back(Dock(&_settings._showDebugWindow, [](bool *p_open) {
+    _docks.push_back(Dock("Debug window", &_settings._showDebugWindow, [](bool *p_open) {
         if (ImGui::Begin("Debug window", p_open)) {
             // DrawDebugInfo();
             ImGui::Text("\xee\x81\x99"
@@ -236,7 +238,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showPropertyEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Stage property editor", &_settings._showPropertyEditor, [self = this](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
             if (auto stg = self->GetCurrentStage()) {
@@ -247,13 +249,13 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showOutliner, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Stage outliner", &_settings._showOutliner, [self = this](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
         DrawStageOutliner(self->GetCurrentStage(), self->_selection);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showTimeline, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Stage timeline", &_settings._showTimeline, [self = this](bool *p_open) {
         ImGui::Begin("Timeline", p_open);
         UsdTimeCode tc = self->_viewport->GetCurrentTimeCode();
         DrawTimeline(self->GetCurrentStage(), tc);
@@ -261,7 +263,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showLayerEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Layer navigator", &_settings._showLayerEditor, [self = this](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer navigation" +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -271,7 +273,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showLayerHierarchyEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Layer hierarchy", &_settings._showLayerHierarchyEditor, [self = this](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer hierarchy " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -281,7 +283,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showLayerStackEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Layer stack", &_settings._showLayerStackEditor, [self = this](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer stack " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -291,14 +293,14 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showContentBrowser, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Content browser", &_settings._showContentBrowser, [self = this](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         ImGui::Begin("Content browser", p_open, windowFlags);
         DrawContentBrowser(*self);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._showPrimSpecEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Layer property editor", &_settings._showPrimSpecEditor, [self = this](bool *p_open) {
         ImGui::Begin("Layer property editor", p_open);
         if (self->GetSelectedPrimSpec()) {
             DrawPrimSpecEditor(self->GetSelectedPrimSpec());
@@ -308,7 +310,7 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock(&_settings._textEditor, [self = this](bool *p_open) {
+    _docks.push_back(Dock("Layer text editor", &_settings._textEditor, [self = this](bool *p_open) {
         ImGui::Begin("Layer text editor", p_open);
         DrawTextEditor(self->GetCurrentLayer());
         ImGui::End();
@@ -480,42 +482,13 @@ void Editor::DrawMainMenuBar() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Windows")) {
-            ImGui::MenuItem("Debug window", nullptr, &_settings._showDebugWindow);
-            ImGui::MenuItem("Content browser", nullptr, &_settings._showContentBrowser);
-            ImGui::MenuItem("Stage outliner", nullptr, &_settings._showOutliner);
-            ImGui::MenuItem("Stage property editor", nullptr, &_settings._showPropertyEditor);
-            ImGui::MenuItem("Stage timeline", nullptr, &_settings._showTimeline);
-            ImGui::MenuItem("Stage viewport", nullptr, &_settings._showViewport);
-            ImGui::MenuItem("Layer navigator", nullptr, &_settings._showLayerEditor);
-            ImGui::MenuItem("Layer hierarchy", nullptr, &_settings._showLayerHierarchyEditor);
-            ImGui::MenuItem("Layer stack", nullptr, &_settings._showLayerStackEditor);
-            ImGui::MenuItem("Layer property editor", nullptr, &_settings._showPrimSpecEditor);
-            ImGui::MenuItem("Layer text editor", nullptr, &_settings._textEditor);
+            for (auto &dock : _docks) {
+                dock.menu_item();
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
-}
-
-void Editor::Draw() {
-    // Dock
-    BeginBackgoundDock();
-
-    // Main Menu bar
-    DrawMainMenuBar();
-
-    for (auto &dock : _docks) {
-        dock.show();
-    }
-
-    DrawCurrentModal();
-
-    ///////////////////////
-    // Top level shortcuts functions
-    AddShortcut<UndoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_Z>();
-    AddShortcut<RedoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_R>();
-
-    EndBackgroundDock();
 }
 
 void Editor::SetSelectedPrimSpec(const SdfPath &primPath) {
@@ -540,7 +513,26 @@ bool Editor::Update() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    Draw();
+    {
+        // Dock
+        BeginBackgoundDock();
+
+        // Main Menu bar
+        DrawMainMenuBar();
+
+        for (auto &dock : _docks) {
+            dock.show();
+        }
+
+        DrawCurrentModal();
+
+        ///////////////////////
+        // Top level shortcuts functions
+        AddShortcut<UndoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_Z>();
+        AddShortcut<RedoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_R>();
+
+        EndBackgroundDock();
+    }
     ImGui::Render();
 
     return true;
