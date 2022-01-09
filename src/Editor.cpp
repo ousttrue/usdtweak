@@ -226,7 +226,6 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
         }
         ImGui::End();
     }));
-    _dock_viewport = &_docks.back();
 
     _docks.push_back(Dock("Debug window", &_settings._showDebugWindow, [](bool *p_open) {
         if (ImGui::Begin("Debug window", p_open)) {
@@ -406,7 +405,7 @@ void Editor::ImportStage(const std::string &path, bool openLoaded) {
         _stageCache.Insert(newStage);
         SetCurrentStage(newStage);
         _settings._showContentBrowser = true;
-        _dock_viewport->set_visible(true);
+        _settings._showViewport = true;
     }
 }
 
@@ -428,7 +427,7 @@ void Editor::CreateStage(const std::string &path) {
             _stageCache.Insert(newStage);
             SetCurrentStage(newStage);
             _settings._showContentBrowser = true;
-            _dock_viewport->set_visible(true);
+            _settings._showViewport = true;
         }
     }
 }

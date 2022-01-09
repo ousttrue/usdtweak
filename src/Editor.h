@@ -33,8 +33,11 @@ class Dock {
             _callback(_p_open);
         }
     }
+};
 
-    void set_visible(bool visible) { *_p_open = visible; }
+class Dockspace
+{
+
 };
 
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
@@ -106,7 +109,6 @@ class Editor {
     void SaveSettings() const;
 
     std::list<Dock> _docks;
-    Dock *_dock_viewport = nullptr;
 
     /// Using a stage cache to store the stages, seems to work well
     UsdStageCache _stageCache;
