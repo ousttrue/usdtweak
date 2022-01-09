@@ -28,40 +28,7 @@ static const std::vector<std::string> GetUsdValidExtensions() {
     return validExtensions;
 }
 
-// /// Modal dialog used to create a new layer
-// struct CreateUsdFileModalDialog : public ModalDialog {
 
-//     CreateUsdFileModalDialog(Editor &editor) : editor(editor), createStage(true) { ResetFileBrowserFilePath(); };
-
-//     void Draw() override {
-//         DrawFileBrowser();
-//         auto filePath = GetFileBrowserFilePath();
-//         ImGui::Checkbox("Open as stage", &createStage);
-//         if (FilePathExists()) {
-//             // ... could add other messages like permission denied, or incorrect extension
-//             ImGui::TextColored(ImVec4(1.0f, 0.1f, 0.1f, 1.0f), "Warning: overwriting");
-//         } else {
-//             if (!filePath.empty()) {
-//                 ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "New stage: ");
-//             }
-//         }
-
-//         ImGui::Text("%s", filePath.c_str());
-//         DrawOkCancelModal([&]() {
-//             if (!filePath.empty()) {
-//                 if (createStage) {
-//                     editor.CreateStage(filePath);
-//                 } else {
-//                     editor.CreateLayer(filePath);
-//                 }
-//             }
-//         });
-//     }
-
-//     const char *DialogId() const override { return "Create usd file"; }
-//     Editor &editor;
-//     bool createStage = true;
-// };
 
 // /// Modal dialog to open a layer
 // struct OpenUsdFileModalDialog : public ModalDialog {
@@ -250,17 +217,11 @@ void Editor::CreateStage(const std::string &path) {
     }
 }
 
-bool Editor::HydraRender() {
-    if (_shutdownRequested) {
-        return false;
-    }
-
+void Editor::HydraRender() {
 #ifndef __APPLE__
     _viewport->Update();
     _viewport->Render();
 #endif
-
-    return true;
 }
 
 void Editor::SetSelectedPrimSpec(const SdfPath &primPath) {

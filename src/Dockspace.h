@@ -2,6 +2,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <algorithm>
 #include <assert.h>
 
 struct GLFWwindow;
@@ -28,14 +29,37 @@ class Dock {
     }
 };
 
+struct MenuItem {
+    std::string name;
+    std::string key;
+    std::function<void()> action;
+    void Draw();
+};
+struct Menu {
+    std::string name;
+    std::list<MenuItem> items;
+    void Draw();
+};
+
 class Dockspace {
     std::list<Dock> _docks;
+    std::list<Menu> _menus;
+    /// Setting _shutdownRequested to true will stop the main loop
+    bool _shutdownRequested = false;
 
   public:
     Dockspace(GLFWwindow *window);
     ~Dockspace();
-    void Render();
+    bool Render();
     std::list<Dock> &Docks() { return _docks; }
+
+    Menu *GetMenu(const std::string &name) {
+        auto found = std::find_if(_menus.begin(), _menus.end(), [name](const Menu &m) { return m.name == name; });
+        if (found == _menus.end()) {
+            return nullptr;
+        }
+        return &*found;
+    }
 
   private:
     void DrawMainMenuBar();

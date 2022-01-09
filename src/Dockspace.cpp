@@ -1,11 +1,31 @@
 #include "Dockspace.h"
+#include "commands/Shortcuts.h"
+#include "widgets/ModalDialogs.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui.h>
-#include "commands/Shortcuts.h"
 #include <IconsFontAwesome5.h>
 #include <GLFW/glfw3.h>
 #include <FontAwesomeFree5.h>
+
+void MenuItem::Draw() {
+    if (action) {
+        if (ImGui::MenuItem(name.c_str(), key.c_str())) {
+            action();
+        }
+    } else {
+        ImGui::Separator();
+    }
+}
+
+void Menu::Draw() {
+    if (ImGui::BeginMenu(name.c_str())) {
+        for (auto &item : items) {
+            item.Draw();
+        }
+        ImGui::EndMenu();
+    }
+}
 
 static void BeginBackgoundDock() {
     // Setup dockspace using experimental imgui branch
@@ -52,7 +72,8 @@ Dockspace::Dockspace(GLFWwindow *window) {
     // Font
     ImFontConfig fontConfig;
     // auto fontDefault = io.Fonts->AddFontDefault(&fontConfig); // DroidSans
-    auto fontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", font_size, &fontConfig, io.Fonts->GetGlyphRangesJapanese()); // DroidSans
+    auto fontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", font_size, &fontConfig,
+                                                    io.Fonts->GetGlyphRangesJapanese()); // DroidSans
 
     // Icons (in font)
     static const ImWchar iconRanges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
@@ -62,6 +83,15 @@ Dockspace::Dockspace(GLFWwindow *window) {
 
     auto font = io.Fonts->AddFontFromMemoryCompressedTTF(fontawesomefree5_compressed_data, fontawesomefree5_compressed_size,
                                                          font_size, &iconsConfig, iconRanges);
+
+    _menus = {{"File", {{}, {"Quit", "", [self = this]() { self->_shutdownRequested = true; }}}},
+              {"Edit",
+               {
+                   {},
+                   {"Cut", "CTRL+X"},
+                   {"Copy", "CTRL+C"},
+                   {"Paste", "CTRL+V"},
+               }}};
 }
 
 Dockspace::~Dockspace() {
@@ -74,55 +104,25 @@ Dockspace::~Dockspace() {
 void Dockspace::DrawMainMenuBar() {
 
     if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem(ICON_FA_FILE " New")) {
-                // DrawModalDialog<CreateUsdFileModalDialog>(*this);
-            }
-            if (ImGui::MenuItem(ICON_FA_FOLDER_OPEN " Open")) {
-                // DrawModalDialog<OpenUsdFileModalDialog>(*this);
-            }
-            ImGui::Separator();
-            // const bool hasLayer = GetCurrentLayer() != SdfLayerRefPtr();
-            // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer", "CTRL+S", false, hasLayer)) {
-            //     GetCurrentLayer()->Save(true);
-            // }
-            // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer as", "CTRL+F", false, hasLayer)) {
-            //     DrawModalDialog<SaveLayerAs>(*this);
-            // }
+        for (auto &menu : _menus) {
+            menu.Draw();
+        }
 
-            ImGui::Separator();
-            if (ImGui::MenuItem("Quit")) {
-                // _shutdownRequested = true;
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit")) {
-            if (ImGui::MenuItem("Undo", "CTRL+Z")) {
-                // ExecuteAfterDraw<UndoCommand>();
-            }
-            if (ImGui::MenuItem("Redo", "CTRL+R")) {
-                // ExecuteAfterDraw<RedoCommand>();
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Cut", "CTRL+X", false, false)) {
-            }
-            if (ImGui::MenuItem("Copy", "CTRL+C", false, false)) {
-            }
-            if (ImGui::MenuItem("Paste", "CTRL+V", false, false)) {
-            }
-            ImGui::EndMenu();
-        }
         if (ImGui::BeginMenu("Windows")) {
             for (auto &dock : _docks) {
                 dock.menu_item();
             }
             ImGui::EndMenu();
         }
+
         ImGui::EndMenuBar();
     }
 }
 
-void Dockspace::Render() {
+bool Dockspace::Render() {
+    if (_shutdownRequested) {
+        return false;
+    }
 
     // imgui
     ImGui_ImplOpenGL3_NewFrame();
@@ -139,7 +139,7 @@ void Dockspace::Render() {
             dock.show();
         }
 
-        // DrawCurrentModal();
+        DrawCurrentModal();
 
         ///////////////////////
         // Top level shortcuts functions
@@ -151,4 +151,6 @@ void Dockspace::Render() {
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    return true;
 }

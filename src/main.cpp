@@ -16,6 +16,8 @@
 #include "widgets/PrimSpecEditor.h"
 #include "widgets/LayerEditor.h"
 #include "widgets/TextEditor.h"
+#include "widgets/ModalDialogs.h"
+#include "widgets/FileBrowser.h"
 //
 #include <pxr/base/arch/fileSystem.h>
 #include <imgui.h>
@@ -32,8 +34,45 @@ class Python {
 };
 #endif
 
+/// Modal dialog used to create a new layer
+struct CreateUsdFileModalDialog : public ModalDialog {
+
+    CreateUsdFileModalDialog(Editor &editor) : editor(editor), createStage(true) { ResetFileBrowserFilePath(); };
+
+    void Draw() override {
+        DrawFileBrowser();
+        auto filePath = GetFileBrowserFilePath();
+        ImGui::Checkbox("Open as stage", &createStage);
+        if (FilePathExists()) {
+            // ... could add other messages like permission denied, or incorrect extension
+            ImGui::TextColored(ImVec4(1.0f, 0.1f, 0.1f, 1.0f), "Warning: overwriting");
+        } else {
+            if (!filePath.empty()) {
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "New stage: ");
+            }
+        }
+
+        ImGui::Text("%s", filePath.c_str());
+        DrawOkCancelModal([&]() {
+            if (!filePath.empty()) {
+                if (createStage) {
+                    editor.CreateStage(filePath);
+                } else {
+                    editor.CreateLayer(filePath);
+                }
+            }
+        });
+    }
+
+    const char *DialogId() const override { return "Create usd file"; }
+    Editor &editor;
+    bool createStage = true;
+};
+
 // setup docks
-void Setup(std::list<Dock> &_docks, Editor *self) {
+void Setup(Dockspace *dockspace, Editor *self) {
+    auto &_docks = dockspace->Docks();
+
     _docks.push_back(Dock("Stage viewport", &self->Settings()._showViewport, [self](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
@@ -130,6 +169,34 @@ void Setup(std::list<Dock> &_docks, Editor *self) {
         DrawTextEditor(self->GetCurrentLayer());
         ImGui::End();
     }));
+
+    auto file = dockspace->GetMenu("File");
+
+    file->items.push_front({ICON_FA_FILE " New", "", [self]() { DrawModalDialog<CreateUsdFileModalDialog>(*self); }});
+
+    // if (ImGui::BeginMenu("File")) {
+    //     if (ImGui::MenuItem(ICON_FA_FOLDER_OPEN " Open")) {
+    //         // DrawModalDialog<OpenUsdFileModalDialog>(*this);
+    //     }
+    //     ImGui::Separator();
+    //     // const bool hasLayer = GetCurrentLayer() != SdfLayerRefPtr();
+    //     // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer", "CTRL+S", false, hasLayer)) {
+    //     //     GetCurrentLayer()->Save(true);
+    //     // }
+    //     // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer as", "CTRL+F", false, hasLayer)) {
+    //     //     DrawModalDialog<SaveLayerAs>(*this);
+    //     // }
+    //     ImGui::EndMenu();
+    // }
+    // if (ImGui::BeginMenu("Edit")) {
+    //     if (ImGui::MenuItem("Undo", "CTRL+Z")) {
+    //         // ExecuteAfterDraw<UndoCommand>();
+    //     }
+    //     if (ImGui::MenuItem("Redo", "CTRL+R")) {
+    //         // ExecuteAfterDraw<RedoCommand>();
+    //     }
+    //     ImGui::EndMenu();
+    // }
 }
 
 int main(int argc, const char **argv) {
@@ -154,7 +221,7 @@ int main(int argc, const char **argv) {
         Editor editor;
         ResourcesLoader resources; // Assuming resources will be destroyed after editor
 
-        Setup(dockspace.Docks(), &editor);
+        Setup(&dockspace, &editor);
 
         window->setOnDrop([&editor](int count, const char **paths) {
             for (int i = 0; i < count; ++i) {
@@ -178,14 +245,15 @@ int main(int argc, const char **argv) {
         int height;
         while (window->newFrame(&width, &height)) {
 
-            if (!editor.HydraRender()) {
-                break;
-            }
+            // render to texture
+            editor.HydraRender();
 
             // Render GUI next
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            dockspace.Render();
+            if (!dockspace.Render()) {
+                break;
+            }
             // This forces to wait for the gpu commands to finish.
             // Normally not required but it fixes a pcoip driver issue
             glFinish();

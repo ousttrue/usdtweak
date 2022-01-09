@@ -52,7 +52,7 @@ class Editor {
     void SaveCurrentLayerAs(const std::string &path);
 
     /// Render the hydra viewport
-    bool HydraRender();
+    void HydraRender();
 
     /// Make the layer editor visible
     void ShowLayerEditor() { _settings._showLayerEditor = true; }
@@ -78,9 +78,6 @@ class Editor {
     std::set<SdfLayerRefPtr> _layers;
     SdfLayerRefPtrVector _layerHistory;
     size_t _layerHistoryPointer;
-
-    /// Setting _shutdownRequested to true will stop the main loop
-    bool _shutdownRequested = false;
 
     ///
     /// Editor settings contains the windows states
