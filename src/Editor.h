@@ -15,7 +15,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 class Editor {
 
 public:
-    Editor();
+    Editor(GLFWwindow *window);
     ~Editor();
 
     /// Removing the copy constructors as we want to make sure there are no unwanted copies of the
@@ -24,8 +24,8 @@ public:
     Editor(const Editor &) = delete;
     Editor &operator=(const Editor &) = delete;
 
-    /// Setting _shutdownRequested to true will stop the main loop
-    bool ShutdownRequested() const { return _shutdownRequested; }
+    bool Update();
+    void Render();
 
     /// Sets the current edited layer
     void SetCurrentLayer(SdfLayerRefPtr layer);
@@ -39,6 +39,8 @@ public:
     UsdStageRefPtr GetCurrentStage() { return _currentStage; }
     void SetCurrentStage(UsdStageCache::Id current);
     void SetCurrentStage(UsdStageRefPtr stage);
+
+
     void SetCurrentEditTarget(SdfLayerHandle layer);
 
 
@@ -56,6 +58,7 @@ public:
     void ImportStage(const std::string &path,  bool openLoaded=true);
     void SaveCurrentLayerAs(const std::string &path);
 
+private:
     /// Render the hydra viewport
     void HydraRender();
 
@@ -69,6 +72,7 @@ public:
     /// Draw the UI
     void Draw();
 
+public:
     /// Handle drag and drop from external applications
     static void DropCallback(GLFWwindow *window, int count, const char **paths);
 

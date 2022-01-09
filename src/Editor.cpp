@@ -1,7 +1,9 @@
 #include <iostream>
 #include <array>
 #include <utility>
+#include <pxr/imaging/glf/contextCaps.h>
 #include <pxr/imaging/garch/glApi.h>
+#include <pxr/base/plug/registry.h>
 #include <pxr/base/arch/fileSystem.h>
 #include <pxr/usd/sdf/fileFormat.h>
 #include <pxr/usd/sdf/layer.h>
@@ -44,7 +46,7 @@ static const std::vector<std::string> GetUsdValidExtensions() {
 }
 
 /// Modal dialog used to create a new layer
- struct CreateUsdFileModalDialog : public ModalDialog {
+struct CreateUsdFileModalDialog : public ModalDialog {
 
     CreateUsdFileModalDialog(Editor &editor) : editor(editor), createStage(true) { ResetFileBrowserFilePath(); };
 
@@ -138,13 +140,13 @@ struct SaveLayerAs : public ModalDialog {
     Editor &editor;
 };
 
-
 static void BeginBackgoundDock() {
     // Setup dockspace using experimental imgui branch
     static bool alwaysOpened = true;
     static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_None;
     static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-    windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    windowFlags |=
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -160,10 +162,7 @@ static void BeginBackgoundDock() {
     ImGui::DockSpace(dockspaceid, ImVec2(0.0f, 0.0f), dockFlags);
 }
 
-static void EndBackgroundDock() {
-    ImGui::End();
-}
-
+static void EndBackgroundDock() { ImGui::End(); }
 
 /// Call back for dropping a file in the ui
 /// TODO Drop callback should popup a modal dialog with the different options available
@@ -186,19 +185,44 @@ void Editor::DropCallback(GLFWwindow *window, int count, const char **paths) {
     }
 }
 
+Editor::Editor(GLFWwindow *window) : _viewport(UsdStageRefPtr(), _selection), _layerHistoryPointer(0) {
+    // Init glew with USD
+    GarchGLApiLoad();
+    GlfContextCaps::InitInstance();
+    std::cout << glGetString(GL_VENDOR) << std::endl;
+    std::cout << glGetString(GL_RENDERER) << std::endl;
+    std::cout << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
+    // GlfRegisterDefaultDebugOutputMessageCallback();
 
-Editor::Editor() : _viewport(UsdStageRefPtr(), _selection), _layerHistoryPointer(0) {
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
     LoadSettings();
+
+    // Create a context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    io.IniFilename = nullptr;
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+
+    // ImGuiStyle& style = ImGui::GetStyle();
+    // style.Colors[ImGuiCol_Tab] = style.Colors[ImGuiCol_FrameBg];
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
 }
 
-Editor::~Editor(){
+Editor::~Editor() {
+    // Shutdown imgui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     SaveSettings();
 }
 
-void Editor::SetCurrentStage(UsdStageCache::Id current) {
-    SetCurrentStage(_stageCache.Find(current));
-}
+void Editor::SetCurrentStage(UsdStageCache::Id current) { SetCurrentStage(_stageCache.Find(current)); }
 
 void Editor::SetCurrentStage(UsdStageRefPtr stage) {
     _currentStage = stage;
@@ -244,13 +268,11 @@ void Editor::SetPreviousLayer() {
     }
 }
 
-
 void Editor::SetNextLayer() {
-    if (_layerHistoryPointer < _layerHistory.size()-1) {
+    if (_layerHistoryPointer < _layerHistory.size() - 1) {
         _layerHistoryPointer++;
     }
 }
-
 
 void Editor::UseLayer(SdfLayerRefPtr layer) {
     if (layer) {
@@ -262,7 +284,6 @@ void Editor::UseLayer(SdfLayerRefPtr layer) {
         _settings._showLayerEditor = true;
     }
 }
-
 
 void Editor::CreateLayer(const std::string &path) {
     auto newLayer = SdfLayer::CreateNew(path);
@@ -308,9 +329,7 @@ void Editor::CreateStage(const std::string &path) {
     }
 }
 
-Viewport & Editor::GetViewport() {
-    return _viewport;
-}
+Viewport &Editor::GetViewport() { return _viewport; }
 
 void Editor::HydraRender() {
 #ifndef __APPLE__
@@ -327,7 +346,7 @@ void Editor::DrawMainMenuBar() {
                 DrawModalDialog<CreateUsdFileModalDialog>(*this);
             }
             if (ImGui::MenuItem(ICON_FA_FOLDER_OPEN " Open")) {
-                 DrawModalDialog<OpenUsdFileModalDialog>(*this);
+                DrawModalDialog<OpenUsdFileModalDialog>(*this);
             }
             ImGui::Separator();
             const bool hasLayer = GetCurrentLayer() != SdfLayerRefPtr();
@@ -396,7 +415,9 @@ void Editor::Draw() {
     if (_settings._showDebugWindow) {
         ImGui::Begin("Debug window", &_settings._showDebugWindow);
         // DrawDebugInfo();
-        ImGui::Text("\xee\x81\x99" " %.3f ms/frame  (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("\xee\x81\x99"
+                    " %.3f ms/frame  (%.1f FPS)",
+                    1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
     }
 
@@ -426,19 +447,19 @@ void Editor::Draw() {
 
     if (_settings._showLayerEditor) {
         const auto &rootLayer = GetCurrentLayer();
-        const std::string title(
-            "Layer navigation" + (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-            "###Layer navigation");
+        const std::string title("Layer navigation" +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer navigation");
         ImGui::Begin(title.c_str(), &_settings._showLayerEditor);
-        DrawLayerNavigation(rootLayer,  GetSelectedPrimSpec());
+        DrawLayerNavigation(rootLayer, GetSelectedPrimSpec());
         ImGui::End();
     }
 
     if (_settings._showLayerHierarchyEditor) {
         const auto &rootLayer = GetCurrentLayer();
-        const std::string title(
-            "Layer hierarchy " + (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-            "###Layer hierarchy");
+        const std::string title("Layer hierarchy " +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer hierarchy");
         ImGui::Begin(title.c_str(), &_settings._showLayerHierarchyEditor);
         DrawLayerPrimHierarchy(rootLayer, GetSelectedPrimSpec());
         ImGui::End();
@@ -446,9 +467,9 @@ void Editor::Draw() {
 
     if (_settings._showLayerStackEditor) {
         const auto &rootLayer = GetCurrentLayer();
-        const std::string title(
-            "Layer stack " + (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-            "###Layer stack");
+        const std::string title("Layer stack " +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer stack");
         ImGui::Begin(title.c_str(), &_settings._showLayerStackEditor);
         DrawLayerSublayers(rootLayer);
         ImGui::End();
@@ -470,10 +491,10 @@ void Editor::Draw() {
         }
         ImGui::End();
     }
-    
+
     if (_settings._textEditor) {
         ImGui::Begin("Layer text editor", &_settings._textEditor);
-            DrawTextEditor(GetCurrentLayer());
+        DrawTextEditor(GetCurrentLayer());
         ImGui::End();
     }
     DrawCurrentModal();
@@ -484,20 +505,34 @@ void Editor::Draw() {
     AddShortcut<RedoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_R>();
 
     EndBackgroundDock();
-
 }
 
-
-void Editor::SetSelectedPrimSpec(const SdfPath& primPath) {
+void Editor::SetSelectedPrimSpec(const SdfPath &primPath) {
     if (GetCurrentLayer()) {
         _selectedPrimSpec = GetCurrentLayer()->GetPrimAtPath(primPath);
     }
 }
 
-void Editor::LoadSettings() {
-    _settings = ResourcesLoader::GetEditorSettings();
+void Editor::LoadSettings() { _settings = ResourcesLoader::GetEditorSettings(); }
+
+void Editor::SaveSettings() const { ResourcesLoader::GetEditorSettings() = _settings; }
+
+bool Editor::Update() {
+    if (_shutdownRequested) {
+        return false;
+    }
+
+    // Render the viewports first as textures
+    HydraRender();
+
+    // imgui
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    Draw();
+    ImGui::Render();
+
+    return true;
 }
 
-void Editor::SaveSettings() const {
-    ResourcesLoader::GetEditorSettings() = _settings;
-}
+void Editor::Render() { ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); }
