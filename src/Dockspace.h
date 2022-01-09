@@ -33,6 +33,7 @@ struct MenuItem {
     std::string name;
     std::string key;
     std::function<void()> action;
+    std::function<bool()> enable_callback;
     void Draw();
 };
 struct Menu {

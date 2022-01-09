@@ -20,6 +20,7 @@
 #include "widgets/FileBrowser.h"
 //
 #include <pxr/base/arch/fileSystem.h>
+#include <pxr/usd/sdf/fileFormat.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -67,6 +68,75 @@ struct CreateUsdFileModalDialog : public ModalDialog {
     const char *DialogId() const override { return "Create usd file"; }
     Editor &editor;
     bool createStage = true;
+};
+
+// Get usd known file format extensions and returns then prefixed with a dot and in a vector
+static const std::vector<std::string> GetUsdValidExtensions() {
+    const auto usdExtensions = SdfFileFormat::FindAllFileFormatExtensions();
+    std::vector<std::string> validExtensions;
+    auto addDot = [](const std::string &str) { return "." + str; };
+    std::transform(usdExtensions.cbegin(), usdExtensions.cend(), std::back_inserter(validExtensions), addDot);
+    return validExtensions;
+}
+
+/// Modal dialog to open a layer
+struct OpenUsdFileModalDialog : public ModalDialog {
+
+    OpenUsdFileModalDialog(Editor &editor) : editor(editor) { SetValidExtensions(GetUsdValidExtensions()); };
+    ~OpenUsdFileModalDialog() override {}
+    void Draw() override {
+        DrawFileBrowser();
+
+        if (FilePathExists()) {
+            ImGui::Checkbox("Open as stage", &openAsStage);
+            if (openAsStage) {
+                ImGui::SameLine();
+                ImGui::Checkbox("Load payloads", &openLoaded);
+            }
+        } else {
+            ImGui::Text("Not found: ");
+        }
+        auto filePath = GetFileBrowserFilePath();
+        ImGui::Text("%s", filePath.c_str());
+        DrawOkCancelModal([&]() {
+            if (!filePath.empty() && FilePathExists()) {
+                if (openAsStage) {
+                    editor.ImportStage(filePath, openLoaded);
+                } else {
+                    editor.ImportLayer(filePath);
+                }
+            }
+        });
+    }
+
+    const char *DialogId() const override { return "Open layer"; }
+    Editor &editor;
+    bool openAsStage = true;
+    bool openLoaded = true;
+};
+
+struct SaveLayerAs : public ModalDialog {
+
+    SaveLayerAs(Editor &editor) : editor(editor){};
+    ~SaveLayerAs() override {}
+    void Draw() override {
+        DrawFileBrowser();
+        auto filePath = GetFileBrowserFilePath();
+        if (FilePathExists()) {
+            ImGui::TextColored(ImVec4(1.0f, 0.1f, 0.1f, 1.0f), "Overwrite: ");
+        } else {
+            ImGui::Text("Save to: ");
+        }
+        ImGui::Text("%s", filePath.c_str());
+        DrawOkCancelModal([&]() { // On Ok ->
+            if (!filePath.empty() && !FilePathExists()) {
+                editor.SaveCurrentLayerAs(filePath);
+            }
+        });
+    }
+
+    const char *DialogId() const override { return "Save layer as"; }
+    Editor &editor;
 };
 
 // setup docks
@@ -171,32 +241,17 @@ void Setup(Dockspace *dockspace, Editor *self) {
     }));
 
     auto file = dockspace->GetMenu("File");
-
+    auto has_layer = [self]() { return self->GetCurrentLayer() != SdfLayerRefPtr(); };
+    file->items.push_front(
+        {ICON_FA_SAVE " Save layer as", "CTRL+F", [self]() { DrawModalDialog<SaveLayerAs>(*self); }, has_layer});
+    file->items.push_front({ICON_FA_SAVE " Save layer", "CTRL+S", [self]() { self->GetCurrentLayer()->Save(true); }, has_layer});
+    file->items.push_front({});
+    file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [self]() { DrawModalDialog<OpenUsdFileModalDialog>(*self); }});
     file->items.push_front({ICON_FA_FILE " New", "", [self]() { DrawModalDialog<CreateUsdFileModalDialog>(*self); }});
 
-    // if (ImGui::BeginMenu("File")) {
-    //     if (ImGui::MenuItem(ICON_FA_FOLDER_OPEN " Open")) {
-    //         // DrawModalDialog<OpenUsdFileModalDialog>(*this);
-    //     }
-    //     ImGui::Separator();
-    //     // const bool hasLayer = GetCurrentLayer() != SdfLayerRefPtr();
-    //     // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer", "CTRL+S", false, hasLayer)) {
-    //     //     GetCurrentLayer()->Save(true);
-    //     // }
-    //     // if (ImGui::MenuItem(ICON_FA_SAVE " Save layer as", "CTRL+F", false, hasLayer)) {
-    //     //     DrawModalDialog<SaveLayerAs>(*this);
-    //     // }
-    //     ImGui::EndMenu();
-    // }
-    // if (ImGui::BeginMenu("Edit")) {
-    //     if (ImGui::MenuItem("Undo", "CTRL+Z")) {
-    //         // ExecuteAfterDraw<UndoCommand>();
-    //     }
-    //     if (ImGui::MenuItem("Redo", "CTRL+R")) {
-    //         // ExecuteAfterDraw<RedoCommand>();
-    //     }
-    //     ImGui::EndMenu();
-    // }
+    auto edit = dockspace->GetMenu("Edit");
+    edit->items.push_front({"Redo", "CTRL+R", []() { ExecuteAfterDraw<RedoCommand>(); }});
+    edit->items.push_front({"Undo", "CTRL+Z", []() { ExecuteAfterDraw<UndoCommand>(); }});
 }
 
 int main(int argc, const char **argv) {

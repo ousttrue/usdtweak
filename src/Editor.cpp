@@ -1,94 +1,9 @@
 #include "Editor.h"
 #include <pxr/imaging/glf/contextCaps.h>
-#include <pxr/imaging/garch/glApi.h>
-#include <pxr/base/plug/registry.h>
 #include <pxr/usd/sdf/fileFormat.h>
-#include <pxr/usd/sdf/layer.h>
-#include <pxr/usd/sdf/layerUtils.h>
-#include <pxr/usd/usd/attribute.h>
-#include <pxr/usd/usd/editTarget.h>
-#include <pxr/usd/usd/primRange.h>
-#include <pxr/usd/usdGeom/camera.h>
-#include <pxr/usd/usdGeom/gprim.h>
 #include "commands/Commands.h"
 #include "resources/ResourcesLoader.h"
 #include <iostream>
-
-// There is a bug in the Undo/Redo when reloading certain layers, here is the post
-// that explains how to debug the issue:
-// Reloading model.stage doesn't work but reloading stage separately does
-// https://groups.google.com/u/1/g/usd-interest/c/lRTmWgq78dc/m/HOZ6x9EdCQAJ
-
-// Get usd known file format extensions and returns then prefixed with a dot and in a vector
-static const std::vector<std::string> GetUsdValidExtensions() {
-    const auto usdExtensions = SdfFileFormat::FindAllFileFormatExtensions();
-    std::vector<std::string> validExtensions;
-    auto addDot = [](const std::string &str) { return "." + str; };
-    std::transform(usdExtensions.cbegin(), usdExtensions.cend(), std::back_inserter(validExtensions), addDot);
-    return validExtensions;
-}
-
-
-
-// /// Modal dialog to open a layer
-// struct OpenUsdFileModalDialog : public ModalDialog {
-
-//     OpenUsdFileModalDialog(Editor &editor) : editor(editor) { SetValidExtensions(GetUsdValidExtensions()); };
-//     ~OpenUsdFileModalDialog() override {}
-//     void Draw() override {
-//         DrawFileBrowser();
-
-//         if (FilePathExists()) {
-//             ImGui::Checkbox("Open as stage", &openAsStage);
-//             if (openAsStage) {
-//                 ImGui::SameLine();
-//                 ImGui::Checkbox("Load payloads", &openLoaded);
-//             }
-//         } else {
-//             ImGui::Text("Not found: ");
-//         }
-//         auto filePath = GetFileBrowserFilePath();
-//         ImGui::Text("%s", filePath.c_str());
-//         DrawOkCancelModal([&]() {
-//             if (!filePath.empty() && FilePathExists()) {
-//                 if (openAsStage) {
-//                     editor.ImportStage(filePath, openLoaded);
-//                 } else {
-//                     editor.ImportLayer(filePath);
-//                 }
-//             }
-//         });
-//     }
-
-//     const char *DialogId() const override { return "Open layer"; }
-//     Editor &editor;
-//     bool openAsStage = true;
-//     bool openLoaded = true;
-// };
-
-// struct SaveLayerAs : public ModalDialog {
-
-//     SaveLayerAs(Editor &editor) : editor(editor){};
-//     ~SaveLayerAs() override {}
-//     void Draw() override {
-//         DrawFileBrowser();
-//         auto filePath = GetFileBrowserFilePath();
-//         if (FilePathExists()) {
-//             ImGui::TextColored(ImVec4(1.0f, 0.1f, 0.1f, 1.0f), "Overwrite: ");
-//         } else {
-//             ImGui::Text("Save to: ");
-//         }
-//         ImGui::Text("%s", filePath.c_str());
-//         DrawOkCancelModal([&]() { // On Ok ->
-//             if (!filePath.empty() && !FilePathExists()) {
-//                 editor.SaveCurrentLayerAs(filePath);
-//             }
-//         });
-//     }
-
-//     const char *DialogId() const override { return "Save layer as"; }
-//     Editor &editor;
-// };
 
 Editor::Editor() : _layerHistoryPointer(0) {
 

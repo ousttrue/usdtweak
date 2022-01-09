@@ -9,12 +9,19 @@
 #include <FontAwesomeFree5.h>
 
 void MenuItem::Draw() {
-    if (action) {
-        if (ImGui::MenuItem(name.c_str(), key.c_str())) {
-            action();
-        }
-    } else {
+    if (name.empty()) {
         ImGui::Separator();
+
+    } else {
+        auto enable = action ? true : false;
+        if (enable_callback) {
+            enable = enable_callback();
+        }
+        if (ImGui::MenuItem(name.c_str(), key.c_str(), false, enable)) {
+            if (action) {
+                action();
+            }
+        }
     }
 }
 
