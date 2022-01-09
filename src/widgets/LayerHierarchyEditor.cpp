@@ -27,6 +27,7 @@
 #include "ImGuiHelpers.h"
 #include "Constants.h"
 #include "Shortcuts.h"
+#include <GLFW/glfw3.h>
 
 struct AddVariantModalDialog : public ModalDialog {
 

@@ -27,6 +27,7 @@
 #include "ResourcesLoader.h"
 #include "TextEditor.h"
 #include "Shortcuts.h"
+#include <GLFW/glfw3.h>
 
 // There is a bug in the Undo/Redo when reloading certain layers, here is the post
 // that explains how to debug the issue:

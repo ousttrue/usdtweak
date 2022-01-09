@@ -4,6 +4,7 @@
 #include "Viewport.h"
 #include "SelectionManipulator.h"
 #include "Gui.h"
+#include <GLFW/glfw3.h>
 
 bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &path) {
     auto prim = stage.GetPrimAtPath(path);
