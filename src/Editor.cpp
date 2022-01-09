@@ -11,8 +11,8 @@
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usdGeom/camera.h>
 #include <pxr/usd/usdGeom/gprim.h>
-#include "Commands.h"
-#include "ResourcesLoader.h"
+#include "commands/Commands.h"
+#include "resources/ResourcesLoader.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 

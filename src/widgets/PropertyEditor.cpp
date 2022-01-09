@@ -9,7 +9,7 @@
 #include "PropertyEditor.h"
 #include "ValueEditor.h"
 #include "Constants.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "ModalDialogs.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -349,7 +349,7 @@ void DrawUsdPrimProperties(UsdPrim &prim, UsdTimeCode currentTime) {
         // Notes from the USD forum:
         // The new UsdPrimCompositionQuery API, which should land in the dev branch soon, will allow you to find any reference,
         // and give you exactly what you need to construct an UsdEditTarget to edit the reference, no matter where it was
-        // authored. You and the user still need to decide and agree whether you’re only allowing “root layerStack” i.e.
+        // authored. You and the user still need to decide and agree whether youï¿½re only allowing ï¿½root layerStackï¿½ i.e.
         // non-destructive edits, or whether all referenced layers are game for editing. The Query API can restrict its search to
         // the root layerStack, if you desire. As described at the top of UsdPrimCompositionQueryArc, once you find the inherits
         // (or specializes) arc that "introduces" the class, use that Arc's GetTargetNode() as the PcpNodeRef for a UsdEditTarget,

@@ -4,7 +4,7 @@
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/primSpec.h>
 #include "Selection.h"
-#include "Viewport.h"
+#include "viewport/Viewport.h"
 #include "EditorSettings.h"
 
 struct GLFWwindow;

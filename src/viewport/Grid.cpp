@@ -16,7 +16,7 @@
 #include "Constants.h" // error codes
 #include "Viewport.h"
 #include "Gui.h"
-#include "GlslCode.h"
+#include "resources/GlslCode.h"
 
 // In the viewing volume, the xy plane clipped at 1, this covers the full view area
 static constexpr const GLfloat gridPoints[] = {1.0,  1.0,  0.f, -1.0, -1.0, 0.f, -1.0, 1.0,  0.f,

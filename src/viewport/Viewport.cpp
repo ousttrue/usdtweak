@@ -10,9 +10,9 @@
 
 #include "Gui.h"
 #include "Viewport.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "Constants.h"
-#include "RendererSettings.h"
+#include "widgets/RendererSettings.h"
 #include <GLFW/glfw3.h>
 
 // TODO: picking meshes: https://groups.google.com/g/usd-interest/c/P2CynIu7MYY/m/UNPIKzmMBwAJ

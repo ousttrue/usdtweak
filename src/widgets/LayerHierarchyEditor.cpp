@@ -18,7 +18,7 @@
 #include <pxr/usd/usdGeom/camera.h>
 
 #include "Editor.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "LayerEditor.h"
@@ -26,7 +26,7 @@
 #include "CompositionEditor.h"
 #include "ImGuiHelpers.h"
 #include "Constants.h"
-#include "Shortcuts.h"
+#include "commands/Shortcuts.h"
 #include <GLFW/glfw3.h>
 
 struct AddVariantModalDialog : public ModalDialog {

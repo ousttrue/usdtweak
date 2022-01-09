@@ -1,6 +1,6 @@
 #include "ResourcesLoader.h"
 #include "Gui.h"
-#include "FontAwesomeFree5.h"
+#include <FontAwesomeFree5.h>
 #include "DefaultImGuiIni.h"
 
 #include <iostream>

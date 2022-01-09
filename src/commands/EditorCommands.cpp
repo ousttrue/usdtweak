@@ -8,7 +8,7 @@
 ///
 
 #include <string>
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "Editor.h"
 
 ///

@@ -7,7 +7,7 @@
 #include "ImGuiHelpers.h"
 #include "ContentBrowser.h"
 #include "LayerEditor.h" // for DrawLayerMenuItems
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "Constants.h"
 #include "TextFilter.h"
 

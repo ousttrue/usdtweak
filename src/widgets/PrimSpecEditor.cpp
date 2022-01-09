@@ -20,7 +20,7 @@
 #include "CompositionEditor.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "Constants.h"
 #include "ValueEditor.h"
 #include "LayerEditor.h"

@@ -6,8 +6,8 @@
 #include "GeometricFunctions.h"
 #include "Viewport.h"
 #include "Gui.h"
-#include "Commands.h"
-#include "GlslCode.h"
+#include "commands/Commands.h"
+#include "resources/GlslCode.h"
 
 /*
 *   Same code as PositionManipulator 

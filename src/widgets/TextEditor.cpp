@@ -1,6 +1,6 @@
 #include "TextEditor.h"
 #include "Gui.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 
 // The following include contains the code which writes usd to text, but it's not
 // distributed with the api

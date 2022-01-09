@@ -1,5 +1,5 @@
 #pragma once
-#include "Commands.h"
+#include "commands/Commands.h"
 
 // Boiler plate code for adding a shortcut, mainly to avoid writing the same code multiple time
 // Only configurable at compile time, so it should change in the future.

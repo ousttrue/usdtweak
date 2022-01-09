@@ -1,7 +1,7 @@
 #include <pxr/usd/usdGeom/camera.h>
 #include "CameraManipulator.h"
 #include "Viewport.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "Gui.h"
 #include <GLFW/glfw3.h>
 

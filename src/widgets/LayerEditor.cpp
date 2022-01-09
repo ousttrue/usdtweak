@@ -18,7 +18,7 @@
 #include <pxr/usd/usdGeom/camera.h>
 
 #include "Editor.h"
-#include "Commands.h"
+#include "commands/Commands.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "LayerEditor.h"
