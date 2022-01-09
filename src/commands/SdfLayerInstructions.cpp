@@ -1,4 +1,5 @@
 
+#include <boost/ref.hpp>
 #include <pxr/usd/sdf/path.h>
 #include <pxr/usd/sdf/abstractData.h>
 #include "SdfLayerInstructions.h"

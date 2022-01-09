@@ -1,0 +1,22 @@
+ 
+const char *ManipulatorVert = 
+"#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec4 inColor;\n"
+"uniform vec3 scale;\n"
+"uniform mat4 modelView;\n"
+"uniform mat4 projection;\n"
+"uniform mat4 objectMatrix;\n"
+"out vec4 color;\n"
+"void main() {\n"
+"    vec4 bPos = objectMatrix*vec4(aPos*scale, 1.0);\n"
+"    gl_Position = projection*modelView*bPos;\n"
+"    color = inColor;\n"
+"// For the rotation circles, hide the parts that should be hidden if the manipulator was a sphere\n"
+"//	vec4 ori = objectMatrix*vec4(0.0, 0.0, 0.0, 1.0);\n"
+"//	vec4 cam = inverse(modelView)*vec4(0.0, 0.0, 0.0, 1.0);\n"
+"//	if(dot((ori-cam), (ori-bPos)) < 0.0){\n"
+"//		color.a = 0.0;\n"
+"//	}\n"
+"}\n"
+;

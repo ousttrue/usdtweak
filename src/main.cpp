@@ -1,5 +1,4 @@
 #include <iostream>
-#include <Python.h>
 #include <pxr/base/plug/registry.h>
 #include <pxr/imaging/glf/contextCaps.h>
 #include <pxr/imaging/glf/simpleLight.h>
