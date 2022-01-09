@@ -185,7 +185,8 @@ void Editor::DropCallback(GLFWwindow *window, int count, const char **paths) {
     }
 }
 
-Editor::Editor(GLFWwindow *window) : _viewport(UsdStageRefPtr(), _selection), _layerHistoryPointer(0) {
+Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
+
     // Init glew with USD
     GarchGLApiLoad();
     GlfContextCaps::InitInstance();
@@ -195,6 +196,8 @@ Editor::Editor(GLFWwindow *window) : _viewport(UsdStageRefPtr(), _selection), _l
     std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
     // GlfRegisterDefaultDebugOutputMessageCallback();
+
+    _viewport = std::make_shared<Viewport>(UsdStageRefPtr(), _selection);
 
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
     LoadSettings();
@@ -211,6 +214,16 @@ Editor::Editor(GLFWwindow *window) : _viewport(UsdStageRefPtr(), _selection), _l
     // style.Colors[ImGuiCol_Tab] = style.Colors[ImGuiCol_FrameBg];
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+    // setup docks
+    _docks.push_back(Dock(&_settings._showViewport, [viewport = this->_viewport](bool *p_open) {
+        ImGui::Begin("Viewport", p_open);
+        ImVec2 wsize = ImGui::GetWindowSize();
+        viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
+        viewport->Draw();
+        ImGui::End();
+    }));
+    _dock_viewport = &_docks.back();
 }
 
 Editor::~Editor() {
@@ -232,7 +245,7 @@ void Editor::SetCurrentStage(UsdStageRefPtr stage) {
         SetCurrentLayer(_currentStage->GetRootLayer());
     }
     // TODO multiple viewport management
-    _viewport.SetCurrentStage(stage);
+    _viewport->SetCurrentStage(stage);
 }
 
 void Editor::SetCurrentLayer(SdfLayerRefPtr layer) {
@@ -302,7 +315,7 @@ void Editor::ImportStage(const std::string &path, bool openLoaded) {
         _stageCache.Insert(newStage);
         SetCurrentStage(newStage);
         _settings._showContentBrowser = true;
-        _settings._showViewport = true;
+        _dock_viewport->set_visible(true);
     }
 }
 
@@ -324,17 +337,15 @@ void Editor::CreateStage(const std::string &path) {
             _stageCache.Insert(newStage);
             SetCurrentStage(newStage);
             _settings._showContentBrowser = true;
-            _settings._showViewport = true;
+            _dock_viewport->set_visible(true);
         }
     }
 }
 
-Viewport &Editor::GetViewport() { return _viewport; }
-
 void Editor::HydraRender() {
 #ifndef __APPLE__
-    _viewport.Update();
-    _viewport.Render();
+    _viewport->Update();
+    _viewport->Render();
 #endif
 }
 
@@ -404,12 +415,8 @@ void Editor::Draw() {
     // Main Menu bar
     DrawMainMenuBar();
 
-    if (_settings._showViewport) {
-        ImGui::Begin("Viewport", &_settings._showViewport);
-        ImVec2 wsize = ImGui::GetWindowSize();
-        GetViewport().SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-        GetViewport().Draw();
-        ImGui::End();
+    for (auto &dock : _docks) {
+        dock.show();
     }
 
     if (_settings._showDebugWindow) {
@@ -426,7 +433,7 @@ void Editor::Draw() {
         ImGui::Begin("Stage property editor", &_settings._showPropertyEditor, windowFlags);
         if (GetCurrentStage()) {
             auto prim = GetCurrentStage()->GetPrimAtPath(GetSelectedPath(_selection));
-            DrawUsdPrimProperties(prim, GetViewport().GetCurrentTimeCode());
+            DrawUsdPrimProperties(prim, _viewport->GetCurrentTimeCode());
         }
         ImGui::End();
     }
@@ -439,9 +446,9 @@ void Editor::Draw() {
 
     if (_settings._showTimeline) {
         ImGui::Begin("Timeline", &_settings._showTimeline);
-        UsdTimeCode tc = GetViewport().GetCurrentTimeCode();
+        UsdTimeCode tc = _viewport->GetCurrentTimeCode();
         DrawTimeline(GetCurrentStage(), tc);
-        GetViewport().SetCurrentTimeCode(tc);
+        _viewport->SetCurrentTimeCode(tc);
         ImGui::End();
     }
 
