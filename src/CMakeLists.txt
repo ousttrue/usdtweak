@@ -1,27 +1,95 @@
-
-target_sources(usdtweak PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Constants.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineOptions.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/CommandLineOptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Editor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Editor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/EditorSettings.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/EditorSettings.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/GeometricFunctions.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Gui.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiHelpers.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/ProxyHelpers.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Selection.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Selection.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/window.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dockspace.cpp
-)
-
+add_executable(
+  usdtweak
+  ""
+  Constants.h
+  CommandLineOptions.h
+  CommandLineOptions.cpp
+  Editor.cpp
+  Editor.h
+  EditorSettings.cpp
+  EditorSettings.h
+  GeometricFunctions.h
+  Gui.h
+  ImGuiHelpers.h
+  ProxyHelpers.h
+  main.cpp
+  window.cpp
+  Dockspace.cpp
+  commands/Commands.cpp
+  commands/Commands.h
+  commands/Shortcuts.h
+  commands/SdfCommandGroup.cpp
+  commands/SdfCommandGroup.h
+  commands/SdfLayerInstructions.cpp
+  commands/SdfLayerInstructions.h
+  commands/SdfUndoRecorder.cpp
+  commands/SdfUndoRecorder.h
+  commands/UndoLayerStateDelegate.cpp
+  commands/UndoLayerStateDelegate.h
+  resources/glsl/GridVert.cpp
+  resources/glsl/GridFrag.cpp
+  resources/glsl/ManipulatorVert.cpp
+  resources/glsl/ManipulatorFrag.cpp
+  resources/ResourcesLoader.cpp
+  resources/ResourcesLoader.h
+  viewport/Selection.cpp
+  viewport/Selection.h
+  viewport/CameraManipulator.cpp
+  viewport/CameraManipulator.h
+  viewport/CameraRig.cpp
+  viewport/CameraRig.h
+  viewport/Grid.cpp
+  viewport/Grid.h
+  viewport/Manipulator.cpp
+  viewport/Manipulator.h
+  viewport/MouseHoverManipulator.cpp
+  viewport/MouseHoverManipulator.h
+  viewport/PositionManipulator.cpp
+  viewport/PositionManipulator.h
+  viewport/RotationManipulator.cpp
+  viewport/RotationManipulator.h
+  viewport/ScaleManipulator.cpp
+  viewport/ScaleManipulator.h
+  viewport/SelectionManipulator.cpp
+  viewport/SelectionManipulator.h
+  viewport/Viewport.cpp
+  viewport/Viewport.h
+  widgets/TextEditor.cpp
+  widgets/TextEditor.h
+  widgets/CompositionEditor.cpp
+  widgets/CompositionEditor.h
+  widgets/FileBrowser.cpp
+  widgets/FileBrowser.h
+  widgets/LayerEditor.cpp
+  widgets/LayerEditor.h
+  widgets/LayerHierarchyEditor.cpp
+  widgets/LayerHierarchyEditor.h
+  widgets/ModalDialogs.cpp
+  widgets/ModalDialogs.h
+  widgets/PrimSpecEditor.cpp
+  widgets/PrimSpecEditor.h
+  widgets/PropertyEditor.cpp
+  widgets/PropertyEditor.h
+  widgets/RendererSettings.cpp
+  widgets/RendererSettings.h
+  widgets/StageOutliner.cpp
+  widgets/StageOutliner.h
+  widgets/ContentBrowser.cpp
+  widgets/ContentBrowser.h
+  widgets/TextFilter.cpp
+  widgets/TextFilter.h
+  widgets/Timeline.cpp
+  widgets/Timeline.h
+  widgets/ValueEditor.cpp
+  widgets/ValueEditor.h
+  widgets/VariantEditor.cpp
+  widgets/VariantEditor.h)
 target_include_directories(usdtweak PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(usdtweak PRIVATE glfw usd)
+subdirs(3rdparty)
 
-add_subdirectory(commands)
-add_subdirectory(3rdparty)
-add_subdirectory(resources)
-add_subdirectory(widgets)
-add_subdirectory(viewport)
+# Remove warnings coming from usd and enable default multithreaded compilation
+# on windows
+target_compile_options(
+  usdtweak PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP /wd4244 /wd4305 /wd4996 /wd4506 /wd4275>
+                   $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)
