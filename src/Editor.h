@@ -7,8 +7,6 @@
 #include "viewport/Viewport.h"
 #include "EditorSettings.h"
 
-PXR_NAMESPACE_USING_DIRECTIVE
-
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
 class Editor {
 

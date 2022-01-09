@@ -2,8 +2,6 @@
 #include <memory>
 #include <pxr/usd/sdf/path.h>
 
-PXR_NAMESPACE_USING_DIRECTIVE
-
 ///
 /// Selection api used by the widgets and the editor
 ///
@@ -11,7 +9,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 /// At the moment we use a HdSelection, but this will change as the we want to store additional states
 /// The selection implementation will move outside this header
 #include <pxr/imaging/hd/selection.h>
-using Selection = std::unique_ptr<HdSelection>;
+using Selection = std::unique_ptr<pxr::HdSelection>;
 using SelectionHash = std::size_t;
 
 /// Functions to modify the selection, they will have different implementation depending on if they
@@ -19,9 +17,9 @@ using SelectionHash = std::size_t;
 /// mechanism / implementation
 /// The interface should remain the same
 void ClearSelection(Selection &selection);
-void AddSelection(Selection &selection, const SdfPath &selectedPath);
-void SetSelected(Selection &selection, const SdfPath &selectedPath);
-bool IsSelected(const Selection &selection, const SdfPath &path);
+void AddSelection(Selection &selection, const pxr::SdfPath &selectedPath);
+void SetSelected(Selection &selection, const pxr::SdfPath &selectedPath);
+bool IsSelected(const Selection &selection, const pxr::SdfPath &path);
 
 bool IsSelectionEmpty(const Selection &selection);
 
@@ -30,10 +28,10 @@ bool IsSelectionEmpty(const Selection &selection);
 bool UpdateSelectionHash(const Selection &selection, SelectionHash &lastSelectionHash);
 
 /// Returns a unique identifier for this selection
-//SelectionHash GetSelectionHash(const Selection &selection);
+// SelectionHash GetSelectionHash(const Selection &selection);
 
 /// Returns the last selected path
-SdfPath GetSelectedPath(const Selection &selection);
+pxr::SdfPath GetSelectedPath(const Selection &selection);
 
 /// Returns all the selected path
-std::vector<SdfPath> GetSelectedPaths(const Selection &selection);
+std::vector<pxr::SdfPath> GetSelectedPaths(const Selection &selection);
