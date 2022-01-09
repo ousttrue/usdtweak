@@ -216,14 +216,103 @@ Editor::Editor(GLFWwindow *window) : _layerHistoryPointer(0) {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     // setup docks
-    _docks.push_back(Dock(&_settings._showViewport, [viewport = this->_viewport](bool *p_open) {
-        ImGui::Begin("Viewport", p_open);
-        ImVec2 wsize = ImGui::GetWindowSize();
-        viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-        viewport->Draw();
+    _docks.push_back(Dock(&_settings._showViewport, [self = this](bool *p_open) {
+        if (ImGui::Begin("Viewport", p_open)) {
+            ImVec2 wsize = ImGui::GetWindowSize();
+            self->_viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
+            self->_viewport->Draw();
+        }
         ImGui::End();
     }));
     _dock_viewport = &_docks.back();
+
+    _docks.push_back(Dock(&_settings._showDebugWindow, [](bool *p_open) {
+        if (ImGui::Begin("Debug window", p_open)) {
+            // DrawDebugInfo();
+            ImGui::Text("\xee\x81\x99"
+                        " %.3f ms/frame  (%.1f FPS)",
+                        1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showPropertyEditor, [self = this](bool *p_open) {
+        ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
+        if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
+            if (auto stg = self->GetCurrentStage()) {
+                auto prim = stg->GetPrimAtPath(GetSelectedPath(self->_selection));
+                DrawUsdPrimProperties(prim, self->_viewport->GetCurrentTimeCode());
+            }
+        }
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showOutliner, [self = this](bool *p_open) {
+        ImGui::Begin("Stage outliner", p_open);
+        DrawStageOutliner(self->GetCurrentStage(), self->_selection);
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showTimeline, [self = this](bool *p_open) {
+        ImGui::Begin("Timeline", p_open);
+        UsdTimeCode tc = self->_viewport->GetCurrentTimeCode();
+        DrawTimeline(self->GetCurrentStage(), tc);
+        self->_viewport->SetCurrentTimeCode(tc);
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showLayerEditor, [self = this](bool *p_open) {
+        const auto &rootLayer = self->GetCurrentLayer();
+        const std::string title("Layer navigation" +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer navigation");
+        ImGui::Begin(title.c_str(), p_open);
+        DrawLayerNavigation(rootLayer, self->GetSelectedPrimSpec());
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showLayerHierarchyEditor, [self = this](bool *p_open) {
+        const auto &rootLayer = self->GetCurrentLayer();
+        const std::string title("Layer hierarchy " +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer hierarchy");
+        ImGui::Begin(title.c_str(), p_open);
+        DrawLayerPrimHierarchy(rootLayer, self->GetSelectedPrimSpec());
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showLayerStackEditor, [self = this](bool *p_open) {
+        const auto &rootLayer = self->GetCurrentLayer();
+        const std::string title("Layer stack " +
+                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
+                                "###Layer stack");
+        ImGui::Begin(title.c_str(), p_open);
+        DrawLayerSublayers(rootLayer);
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showContentBrowser, [self = this](bool *p_open) {
+        ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
+        ImGui::Begin("Content browser", p_open, windowFlags);
+        DrawContentBrowser(*self);
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._showPrimSpecEditor, [self = this](bool *p_open) {
+        ImGui::Begin("Layer property editor", p_open);
+        if (self->GetSelectedPrimSpec()) {
+            DrawPrimSpecEditor(self->GetSelectedPrimSpec());
+        } else {
+            DrawLayerHeader(self->GetCurrentLayer());
+        }
+        ImGui::End();
+    }));
+
+    _docks.push_back(Dock(&_settings._textEditor, [self = this](bool *p_open) {
+        ImGui::Begin("Layer text editor", p_open);
+        DrawTextEditor(self->GetCurrentLayer());
+        ImGui::End();
+    }));
 }
 
 Editor::~Editor() {
@@ -419,91 +508,6 @@ void Editor::Draw() {
         dock.show();
     }
 
-    if (_settings._showDebugWindow) {
-        ImGui::Begin("Debug window", &_settings._showDebugWindow);
-        // DrawDebugInfo();
-        ImGui::Text("\xee\x81\x99"
-                    " %.3f ms/frame  (%.1f FPS)",
-                    1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
-    }
-
-    if (_settings._showPropertyEditor) {
-        ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
-        ImGui::Begin("Stage property editor", &_settings._showPropertyEditor, windowFlags);
-        if (GetCurrentStage()) {
-            auto prim = GetCurrentStage()->GetPrimAtPath(GetSelectedPath(_selection));
-            DrawUsdPrimProperties(prim, _viewport->GetCurrentTimeCode());
-        }
-        ImGui::End();
-    }
-
-    if (_settings._showOutliner) {
-        ImGui::Begin("Stage outliner", &_settings._showOutliner);
-        DrawStageOutliner(GetCurrentStage(), _selection);
-        ImGui::End();
-    }
-
-    if (_settings._showTimeline) {
-        ImGui::Begin("Timeline", &_settings._showTimeline);
-        UsdTimeCode tc = _viewport->GetCurrentTimeCode();
-        DrawTimeline(GetCurrentStage(), tc);
-        _viewport->SetCurrentTimeCode(tc);
-        ImGui::End();
-    }
-
-    if (_settings._showLayerEditor) {
-        const auto &rootLayer = GetCurrentLayer();
-        const std::string title("Layer navigation" +
-                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-                                "###Layer navigation");
-        ImGui::Begin(title.c_str(), &_settings._showLayerEditor);
-        DrawLayerNavigation(rootLayer, GetSelectedPrimSpec());
-        ImGui::End();
-    }
-
-    if (_settings._showLayerHierarchyEditor) {
-        const auto &rootLayer = GetCurrentLayer();
-        const std::string title("Layer hierarchy " +
-                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-                                "###Layer hierarchy");
-        ImGui::Begin(title.c_str(), &_settings._showLayerHierarchyEditor);
-        DrawLayerPrimHierarchy(rootLayer, GetSelectedPrimSpec());
-        ImGui::End();
-    }
-
-    if (_settings._showLayerStackEditor) {
-        const auto &rootLayer = GetCurrentLayer();
-        const std::string title("Layer stack " +
-                                (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
-                                "###Layer stack");
-        ImGui::Begin(title.c_str(), &_settings._showLayerStackEditor);
-        DrawLayerSublayers(rootLayer);
-        ImGui::End();
-    }
-
-    if (_settings._showContentBrowser) {
-        ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
-        ImGui::Begin("Content browser", &_settings._showContentBrowser, windowFlags);
-        DrawContentBrowser(*this);
-        ImGui::End();
-    }
-
-    if (_settings._showPrimSpecEditor) {
-        ImGui::Begin("Layer property editor", &_settings._showPrimSpecEditor);
-        if (GetSelectedPrimSpec()) {
-            DrawPrimSpecEditor(GetSelectedPrimSpec());
-        } else {
-            DrawLayerHeader(GetCurrentLayer());
-        }
-        ImGui::End();
-    }
-
-    if (_settings._textEditor) {
-        ImGui::Begin("Layer text editor", &_settings._textEditor);
-        DrawTextEditor(GetCurrentLayer());
-        ImGui::End();
-    }
     DrawCurrentModal();
 
     ///////////////////////
