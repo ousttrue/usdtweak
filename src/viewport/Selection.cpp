@@ -11,11 +11,11 @@ static bool mustRecomputeHash = true;
 /// Note the following bit of code might have terrible performances when selecting thousands of paths
 /// This has to be tested at some point
 namespace std {
-template <> struct hash<pxr::SdfPathVector> {
-    std::size_t operator()(pxr::SdfPathVector const &paths) const noexcept {
+template <> struct hash<SdfPathVector> {
+    std::size_t operator()(SdfPathVector const &paths) const noexcept {
         std::size_t hashValue = 0;
         for (const auto p : paths) {
-            const auto pathHash = pxr::SdfPath::Hash{}(p);
+            const auto pathHash = SdfPath::Hash{}(p);
             hashValue = pathHash ^ (hashValue << 1);
         }
         return hashValue;
@@ -26,34 +26,34 @@ template <> struct hash<pxr::SdfPathVector> {
 static std::size_t GetSelectionHash(const Selection &selection) {
     if (selection && mustRecomputeHash) {
         auto paths = selection->GetAllSelectedPrimPaths();
-        selectionHash = std::hash<pxr::SdfPathVector>{}(paths);
+        selectionHash = std::hash<SdfPathVector>{}(paths);
     }
     return selectionHash;
 }
 
 /// Clear selection, editor implementation
 void ClearSelection(Selection &selection) {
-    selection.reset(new pxr::HdSelection());
+    selection.reset(new HdSelection());
     mustRecomputeHash = true;
 }
 
-void AddSelection(Selection &selection, const pxr::SdfPath &path) {
+void AddSelection(Selection &selection, const SdfPath &path) {
     if (!selection) {
-        selection.reset(new pxr::HdSelection());
+        selection.reset(new HdSelection());
     }
-    selection->AddRprim(pxr::HdSelection::HighlightModeSelect, path);
+    selection->AddRprim(HdSelection::HighlightModeSelect, path);
     mustRecomputeHash = true;
 }
 
-void SetSelected(Selection &selection, const pxr::SdfPath &path) {
-    selection.reset(new pxr::HdSelection());
-    selection->AddRprim(pxr::HdSelection::HighlightModeSelect, path);
+void SetSelected(Selection &selection, const SdfPath &path) {
+    selection.reset(new HdSelection());
+    selection->AddRprim(HdSelection::HighlightModeSelect, path);
     mustRecomputeHash = true;
 }
 
-bool IsSelected(const Selection &selection, const pxr::SdfPath &path) {
+bool IsSelected(const Selection &selection, const SdfPath &path) {
     if (selection) {
-        if (selection->GetPrimSelectionState(pxr::HdSelection::HighlightModeSelect, path)) {
+        if (selection->GetPrimSelectionState(HdSelection::HighlightModeSelect, path)) {
             return true;
         }
     }
@@ -72,9 +72,9 @@ bool UpdateSelectionHash(const Selection &selection, SelectionHash &lastSelectio
 
 
 
-pxr::SdfPath GetSelectedPath(const Selection &selection) {
+SdfPath GetSelectedPath(const Selection &selection) {
     if (selection) {
-        const auto &paths = selection->GetSelectedPrimPaths(pxr::HdSelection::HighlightModeSelect);
+        const auto &paths = selection->GetSelectedPrimPaths(HdSelection::HighlightModeSelect);
         if (!paths.empty()) {
             return paths[0];
         }
@@ -82,7 +82,7 @@ pxr::SdfPath GetSelectedPath(const Selection &selection) {
     return {};
 }
 
-std::vector<pxr::SdfPath> GetSelectedPaths(const Selection &selection) {
+std::vector<SdfPath> GetSelectedPaths(const Selection &selection) {
     if (selection) {
         return selection->GetAllSelectedPrimPaths();
     }

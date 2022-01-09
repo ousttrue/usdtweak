@@ -3,7 +3,6 @@
 #include <pxr/usd/usd/stageCache.h>
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/primSpec.h>
-#include "Selection.h"
 #include "viewport/Viewport.h"
 #include "EditorSettings.h"
 
@@ -58,7 +57,6 @@ class Editor {
     EditorSettings &Settings() { return _settings; }
 
     Viewport *GetViewport() { return _viewport.get(); }
-    Selection &GetSelection() { return _selection; }
 
   private:
     /// Make sure the layer is correctly in the list of layers,
@@ -84,9 +82,6 @@ class Editor {
 
     UsdStageRefPtr _currentStage;
     std::shared_ptr<Viewport> _viewport;
-
-    // Editor owns the selection for the application
-    Selection _selection;
 
     /// Selected prim spec. This variable might move somewhere else
     SdfPrimSpecHandle _selectedPrimSpec;

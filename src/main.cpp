@@ -166,7 +166,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
             if (auto stg = self->GetCurrentStage()) {
-                auto prim = stg->GetPrimAtPath(GetSelectedPath(self->GetSelection()));
+                auto prim = stg->GetPrimAtPath(GetSelectedPath(self->GetViewport()->GetSelection()));
                 DrawUsdPrimProperties(prim, self->GetViewport()->GetCurrentTimeCode());
             }
         }
@@ -175,7 +175,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
 
     _docks.push_back(Dock("Stage outliner", &self->Settings()._showOutliner, [self](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
-        DrawStageOutliner(self->GetCurrentStage(), self->GetSelection());
+        DrawStageOutliner(self->GetCurrentStage(), self->GetViewport()->GetSelection());
         ImGui::End();
     }));
 

@@ -17,7 +17,7 @@ Editor::Editor() : _layerHistoryPointer(0) {
     std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
     // GlfRegisterDefaultDebugOutputMessageCallback();
 
-    _viewport = std::make_shared<Viewport>(UsdStageRefPtr(), _selection);
+    _viewport = std::make_shared<Viewport>(UsdStageRefPtr());
 
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
     LoadSettings();

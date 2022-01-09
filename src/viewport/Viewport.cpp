@@ -82,9 +82,9 @@ void DrawCameraList(Viewport &viewport) {
 }
 
 
-Viewport::Viewport(UsdStageRefPtr stage, Selection &selection)
+Viewport::Viewport(UsdStageRefPtr stage)
     : _stage(stage), _cameraManipulator({InitialWindowWidth, InitialWindowHeight}),
-      _currentEditingState(new MouseHoverManipulator()), _activeManipulator(&_positionManipulator), _selection(selection),
+      _currentEditingState(new MouseHoverManipulator()), _activeManipulator(&_positionManipulator),
       _viewportSize(InitialWindowWidth, InitialWindowHeight), _selectedCameraPath(perspectiveCameraPath), _renderCamera(&_perspectiveCamera) {
 
     // Viewport draw target

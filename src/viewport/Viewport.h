@@ -23,7 +23,7 @@
 
 class Viewport final {
   public:
-    Viewport(UsdStageRefPtr stage, Selection &);
+    Viewport(UsdStageRefPtr stage);
     ~Viewport();
 
     // Delete copy
@@ -123,7 +123,8 @@ class Viewport final {
     ScaleManipulator _scaleManipulator;
     SelectionManipulator _selectionManipulator;
 
-    Selection &_selection;
+    // Editor owns the selection for the application
+    Selection _selection;
     SelectionHash _lastSelectionHash = 0;
 
     /// Cameras
