@@ -2,7 +2,6 @@
 #include <pxr/imaging/glf/contextCaps.h>
 #include <pxr/imaging/garch/glApi.h>
 #include <pxr/base/plug/registry.h>
-#include <pxr/base/arch/fileSystem.h>
 #include <pxr/usd/sdf/fileFormat.h>
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/layerUtils.h>
@@ -13,7 +12,6 @@
 #include <pxr/usd/usdGeom/gprim.h>
 #include "commands/Commands.h"
 #include "resources/ResourcesLoader.h"
-#include <GLFW/glfw3.h>
 #include <iostream>
 
 // There is a bug in the Undo/Redo when reloading certain layers, here is the post
@@ -125,28 +123,6 @@ static const std::vector<std::string> GetUsdValidExtensions() {
 //     Editor &editor;
 // };
 
-
-/// Call back for dropping a file in the ui
-/// TODO Drop callback should popup a modal dialog with the different options available
-void Editor::DropCallback(GLFWwindow *window, int count, const char **paths) {
-    void *userPointer = glfwGetWindowUserPointer(window);
-    if (userPointer) {
-        Editor *editor = static_cast<Editor *>(userPointer);
-        // TODO: Create a task, add a callback
-        if (editor && count) {
-            for (int i = 0; i < count; ++i) {
-                // make a drop event ?
-                if (ArchGetFileLength(paths[i]) == 0) {
-                    // if the file is empty, this is considered a new file
-                    editor->CreateStage(std::string(paths[i]));
-                } else {
-                    editor->ImportLayer(std::string(paths[i]));
-                }
-            }
-        }
-    }
-}
-
 Editor::Editor() : _layerHistoryPointer(0) {
 
     // Init glew with USD
@@ -165,9 +141,7 @@ Editor::Editor() : _layerHistoryPointer(0) {
     LoadSettings();
 }
 
-Editor::~Editor() {
-    SaveSettings();
-}
+Editor::~Editor() { SaveSettings(); }
 
 void Editor::SetCurrentStage(UsdStageCache::Id current) { SetCurrentStage(_stageCache.Find(current)); }
 

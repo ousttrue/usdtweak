@@ -17,6 +17,7 @@
 #include "widgets/LayerEditor.h"
 #include "widgets/TextEditor.h"
 //
+#include <pxr/base/arch/fileSystem.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -155,7 +156,17 @@ int main(int argc, const char **argv) {
 
         Setup(dockspace.Docks(), &editor);
 
-        window->setOnDrop(&editor, Editor::DropCallback);
+        window->setOnDrop([&editor](int count, const char **paths) {
+            for (int i = 0; i < count; ++i) {
+                // make a drop event ?
+                if (ArchGetFileLength(paths[i]) == 0) {
+                    // if the file is empty, this is considered a new file
+                    editor.CreateStage(std::string(paths[i]));
+                } else {
+                    editor.ImportLayer(std::string(paths[i]));
+                }
+            }
+        });
 
         // Process command line options
         for (auto &stage : options.stages()) {

@@ -7,8 +7,6 @@
 #include "viewport/Viewport.h"
 #include "EditorSettings.h"
 
-struct GLFWwindow;
-
 PXR_NAMESPACE_USING_DIRECTIVE
 
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
@@ -55,9 +53,6 @@ class Editor {
 
     /// Render the hydra viewport
     bool HydraRender();
-
-    /// Handle drag and drop from external applications
-    static void DropCallback(GLFWwindow *window, int count, const char **paths);
 
     /// Make the layer editor visible
     void ShowLayerEditor() { _settings._showLayerEditor = true; }
