@@ -11,3 +11,12 @@
 
 /// Icons font
 #include "IconsFontAwesome5.h"
+
+struct GLFWWindow;
+class Gui {
+  public:
+    Gui(GLFWwindow *window);
+    ~Gui();
+    void beginFrame();
+    void endFrame();
+};

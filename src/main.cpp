@@ -40,18 +40,7 @@ int main(int argc, const char **argv) {
     std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
     // GlfRegisterDefaultDebugOutputMessageCallback();
 
-    // Create a context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.IniFilename = nullptr;
-    ImGui_ImplGlfw_InitForOpenGL(window->get(), true);
-    ImGui_ImplOpenGL3_Init();
-
-    // ImGuiStyle& style = ImGui::GetStyle();
-    // style.Colors[ImGuiCol_Tab] = style.Colors[ImGuiCol_FrameBg];
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    Gui gui(window->get());
 
     { // Scope as the editor should be deleted before imgui and glfw, to release correctly the memory
         // Resource will load the font/textures/settings
@@ -76,12 +65,10 @@ int main(int argc, const char **argv) {
             // Render GUI next
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+
+            gui.beginFrame();
             editor.Draw();
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            gui.endFrame();
 
             // This forces to wait for the gpu commands to finish.
             // Normally not required but it fixes a pcoip driver issue
@@ -92,11 +79,6 @@ int main(int argc, const char **argv) {
             ExecuteCommands();
         }
     }
-
-    // Shutdown imgui
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
 #ifdef WANTS_PYTHON
     Py_Finalize();
