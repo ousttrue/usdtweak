@@ -5,7 +5,7 @@
 #include "commands/Shortcuts.h"
 #include <IconsFontAwesome5.h>
 #include <GLFW/glfw3.h>
-
+#include <FontAwesomeFree5.h>
 
 static void BeginBackgoundDock() {
     // Setup dockspace using experimental imgui branch
@@ -46,6 +46,22 @@ Dockspace::Dockspace(GLFWwindow *window) {
     // style.Colors[ImGuiCol_Tab] = style.Colors[ImGuiCol_FrameBg];
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+    const auto font_size = 24.0f;
+
+    // Font
+    ImFontConfig fontConfig;
+    // auto fontDefault = io.Fonts->AddFontDefault(&fontConfig); // DroidSans
+    auto fontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", font_size, &fontConfig, io.Fonts->GetGlyphRangesJapanese()); // DroidSans
+
+    // Icons (in font)
+    static const ImWchar iconRanges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    ImFontConfig iconsConfig;
+    iconsConfig.MergeMode = true;
+    iconsConfig.PixelSnapH = true;
+
+    auto font = io.Fonts->AddFontFromMemoryCompressedTTF(fontawesomefree5_compressed_data, fontawesomefree5_compressed_size,
+                                                         font_size, &iconsConfig, iconRanges);
 }
 
 Dockspace::~Dockspace() {

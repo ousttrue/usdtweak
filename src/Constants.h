@@ -7,8 +7,8 @@
 constexpr float PI_F = 3.14159265;
 
 /// Size of the main window when it opens.
-constexpr int InitialWindowWidth = 1024;
-constexpr int InitialWindowHeight = 1024;
+constexpr int InitialWindowWidth = 1600;
+constexpr int InitialWindowHeight = 1200;
 
 /// Viewport border between the panel and the window
 constexpr float ViewportBorderSize = 60.f;

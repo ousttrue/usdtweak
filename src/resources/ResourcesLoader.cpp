@@ -1,6 +1,5 @@
 #include "ResourcesLoader.h"
 #include "Gui.h"
-#include <FontAwesomeFree5.h>
 #include "DefaultImGuiIni.h"
 
 #include <iostream>
@@ -21,7 +20,8 @@ std::string GetConfigFilePath() {
         std::wstringstream configFilePath;
         configFilePath << localAppDataDir << L"\\" GUI_CONFIG_FILE;
         CoTaskMemFree(localAppDataDir);
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter; // TODO: this is deprecated in C++17, find another solution
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>
+            converter; // TODO: this is deprecated in C++17, find another solution
         return converter.to_bytes(configFilePath.str());
     }
     return GUI_CONFIG_FILE;
@@ -91,20 +91,6 @@ EditorSettings ResourcesLoader::_editorSettings = EditorSettings();
 EditorSettings &ResourcesLoader::GetEditorSettings() { return _editorSettings; }
 
 ResourcesLoader::ResourcesLoader() {
-    // Font
-    ImGuiIO &io = ImGui::GetIO();
-    ImFontConfig fontConfig;
-    auto fontDefault = io.Fonts->AddFontDefault(&fontConfig); // DroidSans
-
-    // Icons (in font)
-    static const ImWchar iconRanges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
-    ImFontConfig iconsConfig;
-    iconsConfig.MergeMode = true;
-    iconsConfig.PixelSnapH = true;
-
-    auto font = io.Fonts->AddFontFromMemoryCompressedTTF(fontawesomefree5_compressed_data, fontawesomefree5_compressed_size,
-                                                         13.0f, &iconsConfig, iconRanges);
-    //ImGui::Initialize();
     // Install handlers to read and write the settings
     ImGuiContext *imGuiContext = ImGui::GetCurrentContext();
     ImGuiSettingsHandler iniHandler;
