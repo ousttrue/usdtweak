@@ -42,6 +42,10 @@ class Viewport final {
     /// Draw the full widget
     void Draw();
 
+  private:
+    void DrawCameraList();
+
+  public:
     /// Returns the time code of this viewport
     UsdTimeCode GetCurrentTimeCode() const { return _renderparams ? _renderparams->frame : UsdTimeCode::Default(); }
     void SetCurrentTimeCode(const UsdTimeCode &tc);
