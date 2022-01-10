@@ -1,8 +1,8 @@
 #pragma once
+#include "Selection.h"
 #include <pxr/usd/usd/stageCache.h>
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/primSpec.h>
-#include "viewport/Viewport.h"
 #include <set>
 
 /// Editor contains the data shared between widgets, like selections, stages, etc etc

@@ -1,5 +1,5 @@
 #pragma once
-#include "viewport/Selection.h"
+#include "stage/Selection.h"
 #include <pxr/usd/usd/common.h>
 
 class HydraRenderer;

@@ -4,7 +4,7 @@
 #include <pxr/usd/sdf/payload.h>
 #include "CompositionEditor.h"
 #include "ImGuiHelpers.h"
-#include "ProxyHelpers.h"
+#include "stage/ProxyHelpers.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "stage/commands/Commands.h"

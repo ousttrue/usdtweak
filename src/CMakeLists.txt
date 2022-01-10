@@ -1,27 +1,12 @@
-subdirs(3rdparty)
+subdirs(3rdparty stage)
 
 add_library(
   usdtweak_lib
   Constants.h
   Gui.h
-  ProxyHelpers.h
   Dockspace.cpp
-  stage/StageLoader.cpp
-  stage/commands/Commands.cpp
-  stage/commands/Commands.h
-  stage/commands/Shortcuts.h
-  stage/commands/SdfCommandGroup.cpp
-  stage/commands/SdfCommandGroup.h
-  stage/commands/SdfLayerInstructions.cpp
-  stage/commands/SdfLayerInstructions.h
-  stage/commands/SdfUndoRecorder.cpp
-  stage/commands/SdfUndoRecorder.h
-  stage/commands/UndoLayerStateDelegate.cpp
-  stage/commands/UndoLayerStateDelegate.h
   viewport/GridVert.cpp
   viewport/GridFrag.cpp
-  viewport/Selection.cpp
-  viewport/Selection.h
   viewport/Grid.cpp
   viewport/Grid.h
   viewport/manipulators/CameraRig.cpp
@@ -75,7 +60,7 @@ add_library(
   widgets/VariantEditor.cpp
   widgets/VariantEditor.h)
 target_include_directories(usdtweak_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(usdtweak_lib PUBLIC imgui usd filesystem fontawesome
+target_link_libraries(usdtweak_lib PUBLIC imgui usd usdtweak_stage filesystem fontawesome
                                           iconfontcppheaders)
 
 # Remove warnings coming from usd and enable default multithreaded compilation

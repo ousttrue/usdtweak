@@ -1,6 +1,6 @@
 #pragma once
 #include <pxr/usd/usd/stage.h>
-#include "viewport/Selection.h" // TODO: ideally we should have only pxr headers here
+#include "stage/Selection.h" // TODO: ideally we should have only pxr headers here
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

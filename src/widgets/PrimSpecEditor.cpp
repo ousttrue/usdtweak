@@ -25,7 +25,7 @@
 #include "ValueEditor.h"
 #include "LayerEditor.h"
 #include "VariantEditor.h"
-#include "ProxyHelpers.h"
+#include "stage/ProxyHelpers.h"
 
 //// NOTES: Sdf API: Removing a variantSet and cleaning it from the list editing
 //// -> https://groups.google.com/g/usd-interest/c/OeqtGl_1H-M/m/xjCx3dT9EgAJ

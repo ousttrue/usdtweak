@@ -9,7 +9,7 @@
 
 #include <string>
 #include "Commands.h"
-#include "stage/StageLoader.h"
+#include "StageLoader.h"
 
 ///
 /// Base class for an editor command, contai ns only a pointer of the editor

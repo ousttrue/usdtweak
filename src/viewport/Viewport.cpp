@@ -11,7 +11,6 @@
 #include "Gui.h"
 #include "Viewport.h"
 #include "Constants.h"
-#include "viewport/Selection.h"
 #include "widgets/RendererSettings.h"
 
 // TODO: picking meshes: https://groups.google.com/g/usd-interest/c/P2CynIu7MYY/m/UNPIKzmMBwAJ

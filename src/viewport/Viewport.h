@@ -12,7 +12,7 @@
 #include "manipulators/SelectionManipulator.h"
 #include "manipulators/RotationManipulator.h"
 #include "manipulators/ScaleManipulator.h"
-#include "Selection.h"
+#include "stage/Selection.h"
 #include "Grid.h"
 #include <pxr/imaging/glf/drawTarget.h>
 #include <pxr/usd/usd/stage.h>

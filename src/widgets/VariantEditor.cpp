@@ -4,7 +4,7 @@
 #include "Gui.h"
 #include "Constants.h"
 #include "stage/commands/Commands.h"
-#include "ProxyHelpers.h"
+#include "stage/ProxyHelpers.h"
 #include "ImGuiHelpers.h"
 
 static void DrawVariantSelectionMiniButton(SdfPrimSpecHandle &primSpec, const std::string &variantSetName, int &buttonId) {

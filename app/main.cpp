@@ -1,6 +1,7 @@
 #include "Dockspace.h"
 #include "stage/StageLoader.h"
 #include "stage/commands/Commands.h"
+#include "viewport/Viewport.h"
 #include "Constants.h"
 #include "CommandLineOptions.h"
 #include "window.h"

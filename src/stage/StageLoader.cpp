@@ -1,6 +1,7 @@
-#include "stage/StageLoader.h"
+#include "StageLoader.h"
 #include <pxr/imaging/glf/contextCaps.h>
 #include <pxr/usd/sdf/fileFormat.h>
+#include <pxr/imaging/glf/drawTarget.h>
 #include "commands/Commands.h"
 #include <iostream>
 
@@ -13,7 +14,7 @@ StageLoader::StageLoader() : _layerHistoryPointer(0) {
     std::cout << glGetString(GL_RENDERER) << std::endl;
     std::cout << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-    std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
+    // std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
     // GlfRegisterDefaultDebugOutputMessageCallback();
 
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
