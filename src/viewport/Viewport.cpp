@@ -12,6 +12,7 @@
 #include "Viewport.h"
 #include "commands/Commands.h"
 #include "Constants.h"
+#include "viewport/Selection.h"
 #include "widgets/RendererSettings.h"
 
 // TODO: picking meshes: https://groups.google.com/g/usd-interest/c/P2CynIu7MYY/m/UNPIKzmMBwAJ
@@ -157,7 +158,7 @@ Viewport::~Viewport() {
 }
 
 /// Draw the viewport widget
-void Viewport::Draw(UsdStageRefPtr stage) {
+void Viewport::Draw(UsdStageRefPtr stage, Selection &selection) {
     ImVec2 wsize = ImGui::GetWindowSize();
     ImGui::Button("\xef\x80\xb0 Cameras");
     ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonLeft;
@@ -210,7 +211,7 @@ void Viewport::Draw(UsdStageRefPtr stage) {
         //    ImGui::Button("Deactivate");
         //    ImGui::EndPopup();
         //}
-        HandleManipulationEvents(stage);
+        HandleManipulationEvents(stage, selection);
         HandleKeyboardShortcut();
 
         DrawManipulatorToolbox(cursorPos);
@@ -348,7 +349,7 @@ void Viewport::HandleKeyboardShortcut() {
     }
 }
 
-void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage) {
+void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection) {
 
     ImGuiContext *g = ImGui::GetCurrentContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -372,7 +373,7 @@ void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage) {
             _currentEditingState->OnBeginEdition(stage, *this);
         }
 
-        auto newState = _currentEditingState->OnUpdate(stage, *this);
+        auto newState = _currentEditingState->OnUpdate(stage, selection, *this);
         if (newState != _currentEditingState) {
             _currentEditingState->OnEndEdition(stage, *this);
             _currentEditingState = newState;
@@ -409,7 +410,9 @@ template <typename HasPositionT> inline void CopyCameraPosition(const GfCamera &
     object.SetPosition(lightPos);
 }
 
-void Viewport::Render(UsdStageRefPtr stage) {
+void Viewport::Render(UsdStageRefPtr stage, Selection &selection) {
+    Update(stage, selection);
+
     GfVec2i renderSize = _drawTarget->GetSize();
     int width = renderSize[0];
     int height = renderSize[1];
@@ -459,7 +462,7 @@ void Viewport::SetCurrentTimeCode(const UsdTimeCode &tc) {
 }
 
 /// Update anything that could have change after a frame render
-void Viewport::Update(UsdStageRefPtr stage) {
+void Viewport::Update(UsdStageRefPtr stage, Selection &selection) {
     if (stage) {
         auto whichRenderer = _renderers.find(stage); /// We expect a very limited number of opened stages
         if (whichRenderer == _renderers.end()) {
@@ -499,14 +502,14 @@ void Viewport::Update(UsdStageRefPtr stage) {
     GetCurrentCamera().SetPerspectiveFromAspectRatioAndFieldOfView(double(_viewportSize[0]) / double(_viewportSize[1]),
                                                                    _renderCamera->GetFieldOfView(GfCamera::FOVHorizontal),
                                                                    GfCamera::FOVHorizontal);
-    if (_renderer && UpdateSelectionHash(_selection, _lastSelectionHash)) {
+    if (_renderer && UpdateSelectionHash(selection, _lastSelectionHash)) {
         _renderer->ClearSelected();
-        _renderer->SetSelected(GetSelectedPaths(_selection));
+        _renderer->SetSelected(GetSelectedPaths(selection));
 
         // Tell the manipulators the selection has changed
-        _positionManipulator.OnSelectionChange(stage, *this);
-        _rotationManipulator.OnSelectionChange(stage, *this);
-        _scaleManipulator.OnSelectionChange(stage, *this);
+        _positionManipulator.OnSelectionChange(stage, selection, *this);
+        _rotationManipulator.OnSelectionChange(stage, selection, *this);
+        _scaleManipulator.OnSelectionChange(stage, selection, *this);
     }
 }
 

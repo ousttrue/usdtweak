@@ -9,7 +9,7 @@ class CameraManipulator : public CameraRig, public Manipulator {
     CameraManipulator(const GfVec2i &viewportSize, bool isZUp = false);
 
     void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
     void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
 
   private:

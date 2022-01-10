@@ -20,7 +20,7 @@ class ScaleManipulator : public Manipulator {
     ~ScaleManipulator();
 
     void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
     void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
 
     /// Return true if the mouse is over this manipulator for the viewport passed in argument
@@ -30,7 +30,7 @@ class ScaleManipulator : public Manipulator {
     void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
 
     /// Called when the viewport changes its selection
-    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
 
     typedef enum { // use class enum ??
         XAxis = 0,

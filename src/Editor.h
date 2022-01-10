@@ -37,6 +37,8 @@ class Editor {
 
     UsdStageCache &GetStageCache() { return _stageCache; }
 
+    Selection &GetSelection() { return _selection; }
+
     /// Returns the selected primspec
     /// There should be one selected primspec per layer ideally, so it's very likely this function will move
     SdfPrimSpecHandle &GetSelectedPrimSpec() { return _selectedPrimSpec; }
@@ -63,6 +65,9 @@ class Editor {
     size_t _layerHistoryPointer;
 
     UsdStageRefPtr _currentStage;
+
+    // Editor owns the selection for the application
+    Selection _selection;
 
     /// Selected prim spec. This variable might move somewhere else
     SdfPrimSpecHandle _selectedPrimSpec;

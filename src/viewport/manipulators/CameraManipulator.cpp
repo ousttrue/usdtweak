@@ -19,7 +19,7 @@ void CameraManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport 
     }
 }
 
-Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     auto &cameraManipulator = viewport.GetCameraManipulator();
     ImGuiIO &io = ImGui::GetIO();
 

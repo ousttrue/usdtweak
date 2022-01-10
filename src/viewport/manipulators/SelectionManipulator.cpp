@@ -33,8 +33,7 @@ bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &
     return false;
 }
 
-Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
-    Selection &selection = viewport.GetSelection();
+Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     auto mousePosition = viewport.GetMousePosition();
     SdfPath outHitPrimPath;
     SdfPath outHitInstancerPath;

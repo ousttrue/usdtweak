@@ -1,8 +1,9 @@
 #include "MouseHoverManipulator.h"
+#include "viewport/Selection.h"
 #include "viewport/Viewport.h"
 #include <imgui.h>
 
-Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     ImGuiIO &io = ImGui::GetIO();
 
     if (io.KeyAlt) {
@@ -15,9 +16,8 @@ Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, V
             return viewport.GetManipulator<SelectionManipulator>();
         }
     } else if (ImGui::IsKeyPressed('F')) {
-        const Selection &selection = viewport.GetSelection();
         if (!IsSelectionEmpty(selection)) {
-            viewport.FrameSelection(stage, viewport.GetSelection());
+            viewport.FrameSelection(stage, selection);
         } else {
             viewport.FrameRootPrim(stage);
         }

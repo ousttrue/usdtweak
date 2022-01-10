@@ -139,14 +139,14 @@ struct SaveLayerAs : public ModalDialog {
 };
 
 // setup docks
-void Setup(Dockspace *dockspace, Editor *self, Viewport *viewport) {
+void Setup(Dockspace *dockspace, Editor *editor, Viewport *viewport) {
     auto &_docks = dockspace->Docks();
 
-    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [self, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [editor, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
             viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-            viewport->Draw(self->GetCurrentStage());
+            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection());
         }
         ImGui::End();
     }));
@@ -161,53 +161,53 @@ void Setup(Dockspace *dockspace, Editor *self, Viewport *viewport) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [self, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [editor, viewport](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
-            if (auto stg = self->GetCurrentStage()) {
-                auto prim = stg->GetPrimAtPath(GetSelectedPath(viewport->GetSelection()));
+            if (auto stg = editor->GetCurrentStage()) {
+                auto prim = stg->GetPrimAtPath(GetSelectedPath(editor->GetSelection()));
                 DrawUsdPrimProperties(prim, viewport->GetCurrentTimeCode());
             }
         }
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [self, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [editor, viewport](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
-        DrawStageOutliner(self->GetCurrentStage(), viewport->GetSelection());
+        DrawStageOutliner(editor->GetCurrentStage(), editor->GetSelection());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [self, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [editor, viewport](bool *p_open) {
         ImGui::Begin("Timeline", p_open);
         UsdTimeCode tc = viewport->GetCurrentTimeCode();
-        DrawTimeline(self->GetCurrentStage(), tc);
+        DrawTimeline(editor->GetCurrentStage(), tc);
         viewport->SetCurrentTimeCode(tc);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer navigator", &dockspace->Settings()._showLayerEditor, [self](bool *p_open) {
-        const auto &rootLayer = self->GetCurrentLayer();
+    _docks.push_back(Dock("Layer navigator", &dockspace->Settings()._showLayerEditor, [editor](bool *p_open) {
+        const auto &rootLayer = editor->GetCurrentLayer();
         const std::string title("Layer navigation" +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer navigation");
         ImGui::Begin(title.c_str(), p_open);
-        DrawLayerNavigation(rootLayer, self->GetSelectedPrimSpec());
+        DrawLayerNavigation(rootLayer, editor->GetSelectedPrimSpec());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer hierarchy", &dockspace->Settings()._showLayerHierarchyEditor, [self](bool *p_open) {
-        const auto &rootLayer = self->GetCurrentLayer();
+    _docks.push_back(Dock("Layer hierarchy", &dockspace->Settings()._showLayerHierarchyEditor, [editor](bool *p_open) {
+        const auto &rootLayer = editor->GetCurrentLayer();
         const std::string title("Layer hierarchy " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer hierarchy");
         ImGui::Begin(title.c_str(), p_open);
-        DrawLayerPrimHierarchy(rootLayer, self->GetSelectedPrimSpec());
+        DrawLayerPrimHierarchy(rootLayer, editor->GetSelectedPrimSpec());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer stack", &dockspace->Settings()._showLayerStackEditor, [self](bool *p_open) {
-        const auto &rootLayer = self->GetCurrentLayer();
+    _docks.push_back(Dock("Layer stack", &dockspace->Settings()._showLayerStackEditor, [editor](bool *p_open) {
+        const auto &rootLayer = editor->GetCurrentLayer();
         const std::string title("Layer stack " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer stack");
@@ -216,37 +216,37 @@ void Setup(Dockspace *dockspace, Editor *self, Viewport *viewport) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Content browser", &dockspace->Settings()._showContentBrowser, [self](bool *p_open) {
+    _docks.push_back(Dock("Content browser", &dockspace->Settings()._showContentBrowser, [editor](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         ImGui::Begin("Content browser", p_open, windowFlags);
-        DrawContentBrowser(*self);
+        DrawContentBrowser(*editor);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer property editor", &dockspace->Settings()._showPrimSpecEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer property editor", &dockspace->Settings()._showPrimSpecEditor, [editor](bool *p_open) {
         ImGui::Begin("Layer property editor", p_open);
-        if (self->GetSelectedPrimSpec()) {
-            DrawPrimSpecEditor(self->GetSelectedPrimSpec());
+        if (editor->GetSelectedPrimSpec()) {
+            DrawPrimSpecEditor(editor->GetSelectedPrimSpec());
         } else {
-            DrawLayerHeader(self->GetCurrentLayer());
+            DrawLayerHeader(editor->GetCurrentLayer());
         }
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer text editor", &dockspace->Settings()._textEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer text editor", &dockspace->Settings()._textEditor, [editor](bool *p_open) {
         ImGui::Begin("Layer text editor", p_open);
-        DrawTextEditor(self->GetCurrentLayer());
+        DrawTextEditor(editor->GetCurrentLayer());
         ImGui::End();
     }));
 
     auto file = dockspace->GetMenu("File");
-    auto has_layer = [self]() { return self->GetCurrentLayer() != SdfLayerRefPtr(); };
+    auto has_layer = [editor]() { return editor->GetCurrentLayer() != SdfLayerRefPtr(); };
     file->items.push_front(
-        {ICON_FA_SAVE " Save layer as", "CTRL+F", [self]() { DrawModalDialog<SaveLayerAs>(*self); }, has_layer});
-    file->items.push_front({ICON_FA_SAVE " Save layer", "CTRL+S", [self]() { self->GetCurrentLayer()->Save(true); }, has_layer});
+        {ICON_FA_SAVE " Save layer as", "CTRL+F", [editor]() { DrawModalDialog<SaveLayerAs>(*editor); }, has_layer});
+    file->items.push_front({ICON_FA_SAVE " Save layer", "CTRL+S", [editor]() { editor->GetCurrentLayer()->Save(true); }, has_layer});
     file->items.push_front({});
-    file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [self]() { DrawModalDialog<OpenUsdFileModalDialog>(*self); }});
-    file->items.push_front({ICON_FA_FILE " New", "", [self]() { DrawModalDialog<CreateUsdFileModalDialog>(*self); }});
+    file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [editor]() { DrawModalDialog<OpenUsdFileModalDialog>(*editor); }});
+    file->items.push_front({ICON_FA_FILE " New", "", [editor]() { DrawModalDialog<CreateUsdFileModalDialog>(*editor); }});
 
     auto edit = dockspace->GetMenu("Edit");
     edit->items.push_front({"Redo", "CTRL+R", []() { ExecuteAfterDraw<RedoCommand>(); }});
@@ -300,7 +300,7 @@ int main(int argc, const char **argv) {
         while (window->newFrame(&width, &height)) {
 
             // render to texture
-            viewport.Render(editor.GetCurrentStage());
+            viewport.Render(editor.GetCurrentStage(), editor.GetSelection());
 
             // Render GUI next
             glViewport(0, 0, width, height);

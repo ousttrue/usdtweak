@@ -161,8 +161,7 @@ bool PositionManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Vi
 }
 
 // Same as rotation manipulator now -- TODO : share in a common class
-void PositionManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
-    auto &selection = viewport.GetSelection();
+void PositionManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
@@ -249,7 +248,7 @@ void PositionManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewp
     BeginEdition(stage);
 }
 
-Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
 
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();

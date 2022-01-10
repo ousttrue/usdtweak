@@ -31,18 +31,18 @@ class Viewport final {
     Viewport &operator=(const Viewport &) = delete;
 
     /// Render hydra
-    void Render(UsdStageRefPtr stage);
+    void Render(UsdStageRefPtr stage, Selection &selection);
 
-private:
+  private:
     /// Update internal data: selection, current renderer
-    void Update(UsdStageRefPtr stage);
+    void Update(UsdStageRefPtr stage, Selection &selection);
 
-public:
+  public:
     /// Set the hydra render size
     void SetSize(int width, int height);
 
     /// Draw the full widget
-    void Draw(UsdStageRefPtr stage);
+    void Draw(UsdStageRefPtr stage, Selection &selection);
 
   private:
     void DrawCameraList(UsdStageRefPtr stage);
@@ -70,7 +70,8 @@ public:
     CameraManipulator &GetCameraManipulator() { return _cameraManipulator; }
 
     // Picking
-    bool TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
+    bool TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
+                          SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
     GfVec2d GetPickingBoundarySize() const;
 
     // Utility function for compute a scale for the manipulators. It uses the distance between the camera
@@ -92,20 +93,16 @@ public:
     /// Draw manipulator toolbox, to select translate, rotate, scale
     void DrawManipulatorToolbox(const struct ImVec2 &origin);
 
-
-
     // Position of the mouse in the viewport in normalized unit
     // This is computed in HandleEvents
 
     GfVec2d GetMousePosition() const { return _mousePosition; }
 
-    Selection &GetSelection() { return _selection; }
-
     SelectionManipulator &GetSelectionManipulator() { return _selectionManipulator; }
 
     /// Handle events is implemented as a finite state machine.
     /// The state are simply the current manipulator used.
-    void HandleManipulationEvents(const pxr::UsdStageRefPtr &stage);
+    void HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection);
     void HandleKeyboardShortcut();
 
   private:
@@ -124,8 +121,6 @@ public:
     ScaleManipulator _scaleManipulator;
     SelectionManipulator _selectionManipulator;
 
-    // Editor owns the selection for the application
-    Selection _selection;
     SelectionHash _lastSelectionHash = 0;
 
     /// Cameras

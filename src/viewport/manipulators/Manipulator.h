@@ -1,4 +1,5 @@
 #pragma once
+#include "viewport/Selection.h"
 #include <pxr/usd/usd/common.h>
 
 class Viewport;
@@ -15,7 +16,7 @@ struct Manipulator {
     virtual ~Manipulator(){};
     virtual void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &){};     // Enter State
     virtual void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &){};       // Exit State
-    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) = 0; // Next State
+    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) = 0; // Next State
 
     virtual bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &) { return false; };
 
@@ -23,5 +24,5 @@ struct Manipulator {
     virtual void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &){};
 
     /// Called when the viewport changes its selection
-    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &){};
+    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &){};
 };

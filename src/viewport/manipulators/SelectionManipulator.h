@@ -10,7 +10,7 @@ class SelectionManipulator : public Manipulator {
 
     void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
 
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
 
     // Picking modes
     enum class PickMode { Prim, Model, Assembly };

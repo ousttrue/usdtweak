@@ -191,9 +191,8 @@ bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Vi
     return false;
 }
 
-void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     // TODO: we should set here if the new selection will be editable or not
-    auto &selection = viewport.GetSelection();
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
@@ -318,7 +317,7 @@ void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewp
     BeginEdition(stage);
 }
 
-Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
     }
