@@ -1,7 +1,7 @@
 #include "HydraRenderer.h"
 #include <Constants.h>
 #include <Selection.h>
-
+#include <AovUtil.h>
 #include <pxr/imaging/garch/glApi.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usdGeom/boundable.h>
@@ -484,8 +484,7 @@ void HydraRenderer::Update(UsdStageRefPtr stage, Selection &selection) {
             _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
             _grid.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
 
-            // TODO:
-            // InitializeRendererAov(*_renderer);
+            InitializeRendererAov(*_renderer);
         } else if (whichRenderer->second != _renderer) {
             _renderer = whichRenderer->second;
             _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");

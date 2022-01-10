@@ -3,6 +3,7 @@ add_library(
   ${TARGET_NAME}
   StageLoader.cpp
   Selection.cpp
+  AovUtil.cpp
   commands/Commands.cpp
   commands/Commands.h
   commands/Shortcuts.h
