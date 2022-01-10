@@ -6,8 +6,6 @@ add_executable(
   CommandLineOptions.cpp
   Editor.cpp
   Editor.h
-  EditorSettings.cpp
-  EditorSettings.h
   GeometricFunctions.h
   Gui.h
   ImGuiHelpers.h
