@@ -1,6 +1,7 @@
-add_executable(
-  usdtweak
-  ""
+subdirs(3rdparty)
+
+add_library(
+  usdtweak_lib
   Constants.h
   CommandLineOptions.h
   CommandLineOptions.cpp
@@ -10,8 +11,6 @@ add_executable(
   Gui.h
   ImGuiHelpers.h
   ProxyHelpers.h
-  main.cpp
-  window.cpp
   Dockspace.cpp
   commands/Commands.cpp
   commands/Commands.h
@@ -80,12 +79,18 @@ add_executable(
   widgets/ValueEditor.h
   widgets/VariantEditor.cpp
   widgets/VariantEditor.h)
-target_include_directories(usdtweak PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(usdtweak PRIVATE glfw usd)
-subdirs(3rdparty)
+target_include_directories(usdtweak_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(usdtweak_lib PUBLIC imgui usd filesystem fontawesome
+                                          iconfontcppheaders)
 
 # Remove warnings coming from usd and enable default multithreaded compilation
 # on windows
 target_compile_options(
-  usdtweak PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP /wd4244 /wd4305 /wd4996 /wd4506 /wd4275>
-                   $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)
+  usdtweak_lib
+  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP
+          /wd4244
+          /wd4305
+          /wd4996
+          /wd4506
+          /wd4275>
+          $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)

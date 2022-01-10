@@ -1,12 +1,11 @@
-
-target_sources(usdtweak PRIVATE
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_draw.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_glfw.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_stdlib.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_tables.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/imgui_widgets.cpp
-)
-
-target_include_directories(usdtweak PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(
+  imgui
+  imgui.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui_stdlib.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp)
+target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(imgui PRIVATE glfw)

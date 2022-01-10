@@ -89,4 +89,4 @@ target_link_directories(usd INTERFACE "$<$<CONFIG:Debug>:${DEBUG_DIR}/lib>"
                         "$<$<CONFIG:Release>:${RELEASE_DIR}/lib>")
 
 # usdtweak
-subdirs(src)
+subdirs(src app)

@@ -13,7 +13,6 @@
 #include "commands/Commands.h"
 #include "Constants.h"
 #include "widgets/RendererSettings.h"
-#include <GLFW/glfw3.h>
 
 // TODO: picking meshes: https://groups.google.com/g/usd-interest/c/P2CynIu7MYY/m/UNPIKzmMBwAJ
 
@@ -311,7 +310,7 @@ void Viewport::HandleKeyboardShortcut() {
     if (ImGui::IsItemHovered()) {
         ImGuiIO &io = ImGui::GetIO();
         static bool SelectionManipulatorPressedOnce = true;
-        if (io.KeysDown[GLFW_KEY_Q]) {
+        if (io.KeysDown['Q']) {
             if (SelectionManipulatorPressedOnce) {
                 ChooseManipulator<MouseHoverManipulator>();
                 SelectionManipulatorPressedOnce = false;
@@ -321,7 +320,7 @@ void Viewport::HandleKeyboardShortcut() {
         }
 
         static bool PositionManipulatorPressedOnce = true;
-        if (io.KeysDown[GLFW_KEY_W]) {
+        if (io.KeysDown['W']) {
             if (PositionManipulatorPressedOnce) {
                 ChooseManipulator<PositionManipulator>();
                 PositionManipulatorPressedOnce = false;
@@ -331,7 +330,7 @@ void Viewport::HandleKeyboardShortcut() {
         }
 
         static bool RotationManipulatorPressedOnce = true;
-        if (io.KeysDown[GLFW_KEY_E]) {
+        if (io.KeysDown['E']) {
             if (RotationManipulatorPressedOnce) {
                 ChooseManipulator<RotationManipulator>();
                 RotationManipulatorPressedOnce = false;
@@ -341,7 +340,7 @@ void Viewport::HandleKeyboardShortcut() {
         }
 
         static bool ScaleManipulatorPressedOnce = true;
-        if (io.KeysDown[GLFW_KEY_R]) {
+        if (io.KeysDown['R']) {
             if (ScaleManipulatorPressedOnce) {
                 ChooseManipulator<ScaleManipulator>();
                 ScaleManipulatorPressedOnce = false;

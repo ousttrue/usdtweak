@@ -6,7 +6,6 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <IconsFontAwesome5.h>
-#include <GLFW/glfw3.h>
 #include <FontAwesomeFree5.h>
 #include <iostream>
 #include "DefaultImGuiIni.h"
@@ -270,8 +269,9 @@ bool Dockspace::Render() {
 
         ///////////////////////
         // Top level shortcuts functions
-        AddShortcut<UndoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_Z>();
-        AddShortcut<RedoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_R>();
+        // TODO: use ImGui input
+        // AddShortcut<UndoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_Z>();
+        // AddShortcut<RedoCommand, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_R>();
 
         EndBackgroundDock();
     }

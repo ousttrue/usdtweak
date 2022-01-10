@@ -27,7 +27,6 @@
 #include "ImGuiHelpers.h"
 #include "Constants.h"
 #include "commands/Shortcuts.h"
-#include <GLFW/glfw3.h>
 
 struct AddVariantModalDialog : public ModalDialog {
 
@@ -442,11 +441,11 @@ void DrawLayerPrimHierarchy(SdfLayerRefPtr layer, SdfPrimSpecHandle &selectedPri
         ImGui::EndTable();
     }
     if (ImGui::IsItemHovered() && selectedPrim) {
-        AddShortcut<PrimRemove, GLFW_KEY_DELETE>(selectedPrim);
-        AddShortcut<PrimCopy, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_C>(selectedPrim);
-        AddShortcut<PrimPaste, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_V>(selectedPrim);
-        AddShortcut<PrimDuplicate, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_D>(selectedPrim,
-                                                                      FindNextAvailablePrimName(selectedPrim->GetName()));
-
+        // TODO: use ImGui input
+        // AddShortcut<PrimRemove, GLFW_KEY_DELETE>(selectedPrim);
+        // AddShortcut<PrimCopy, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_C>(selectedPrim);
+        // AddShortcut<PrimPaste, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_V>(selectedPrim);
+        // AddShortcut<PrimDuplicate, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_D>(selectedPrim,
+        //                                                               FindNextAvailablePrimName(selectedPrim->GetName()));
     }
 }

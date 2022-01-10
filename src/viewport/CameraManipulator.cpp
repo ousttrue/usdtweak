@@ -3,7 +3,6 @@
 #include "Viewport.h"
 #include "commands/Commands.h"
 #include "Gui.h"
-#include <GLFW/glfw3.h>
 
 CameraManipulator::CameraManipulator(const GfVec2i &viewportSize, bool isZUp) : CameraRig(viewportSize, isZUp) {}
 
@@ -25,7 +24,7 @@ Manipulator *CameraManipulator::OnUpdate(Viewport &viewport) {
     ImGuiIO &io = ImGui::GetIO();
 
     /// If the user released key alt, escape camera manipulation
-    if (!io.KeysDown[GLFW_KEY_LEFT_ALT]) {
+    if (!io.KeyAlt) {
         return viewport.GetManipulator<MouseHoverManipulator>();
     } else if (ImGui::IsMouseReleased(1) || ImGui::IsMouseReleased(2) || ImGui::IsMouseReleased(0)) {
         SetMovementType(MovementType::None);

@@ -4,7 +4,7 @@
 #include "Viewport.h"
 #include "SelectionManipulator.h"
 #include "Gui.h"
-#include <GLFW/glfw3.h>
+#include "imgui.h"
 
 bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &path) {
     auto prim = stage.GetPrimAtPath(path);
@@ -47,7 +47,7 @@ Manipulator *SelectionManipulator::OnUpdate(Viewport &viewport) {
             }
         }
 
-        if (ImGui::IsKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+        if (ImGui::GetIO().KeyShift) {
             AddSelection(selection, outHitPrimPath);
         } else {
             SetSelected(selection, outHitPrimPath);
