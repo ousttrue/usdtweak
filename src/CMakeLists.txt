@@ -5,9 +5,7 @@ add_library(
   Constants.h
   Editor.cpp
   Editor.h
-  GeometricFunctions.h
   Gui.h
-  ImGuiHelpers.h
   ProxyHelpers.h
   Dockspace.cpp
   commands/Commands.cpp
