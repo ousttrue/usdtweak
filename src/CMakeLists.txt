@@ -21,10 +21,10 @@ add_library(
   commands/SdfUndoRecorder.h
   commands/UndoLayerStateDelegate.cpp
   commands/UndoLayerStateDelegate.h
-  resources/glsl/GridVert.cpp
-  resources/glsl/GridFrag.cpp
-  resources/glsl/ManipulatorVert.cpp
-  resources/glsl/ManipulatorFrag.cpp
+  viewport/GridVert.cpp
+  viewport/GridFrag.cpp
+  viewport/ManipulatorVert.cpp
+  viewport/ManipulatorFrag.cpp
   viewport/Selection.cpp
   viewport/Selection.h
   viewport/CameraManipulator.cpp

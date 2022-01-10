@@ -9,7 +9,7 @@
 #include "Viewport.h"
 #include "Gui.h"
 #include "commands/Commands.h"
-#include "resources/GlslCode.h"
+#include "GlslCode.h"
 
 static constexpr GLfloat axisSize = 1.2f;
 

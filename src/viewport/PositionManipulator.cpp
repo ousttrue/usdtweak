@@ -7,7 +7,7 @@
 #include "Viewport.h"
 #include "Gui.h"
 #include "commands/Commands.h"
-#include "resources/GlslCode.h"
+#include "GlslCode.h"
 
 /*
     TODO:  we ultimately want to be compatible with Vulkan / Metal, the following opengl/glsl code should really be using the
