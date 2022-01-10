@@ -1,16 +1,20 @@
-#include <iostream>
+#include "PropertyEditor.h"
+#include "ValueEditor.h"
+#include "ModalDialogs.h"
+#include "Constants.h"
+
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/variantSets.h>
 #include <pxr/usd/usd/primCompositionQuery.h>
 #include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/usdGeom/xformCommonAPI.h>
 #include <pxr/usd/pcp/node.h>
-#include "Gui.h"
-#include "PropertyEditor.h"
-#include "ValueEditor.h"
-#include <Constants.h>
-#include "stage/commands/Commands.h"
-#include "ModalDialogs.h"
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <IconsFontAwesome5.h>
+
+#include <commands/Commands.h>
+#include <iostream>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

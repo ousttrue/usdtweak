@@ -15,7 +15,8 @@
 #include <pxr/base/vt/array.h>
 #include <pxr/usd/sdf/assetPath.h>
 #include <pxr/usd/sdf/types.h>
-#include "Gui.h"
+#include <imgui.h>
+#include <imgui_stdlib.h>
 
 
 template <typename GfMatrixT, int DataType, int Rows, int Cols>

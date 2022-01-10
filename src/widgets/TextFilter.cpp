@@ -1,4 +1,5 @@
 #include "TextFilter.h"
+#include <imgui_internal.h>
 
 TextFilter::TextFilter(const char *default_filter) {
     if (default_filter) {

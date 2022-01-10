@@ -1,9 +1,3 @@
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <array>
-#include <cctype>
-
 #include <pxr/usd/usd/schemaRegistry.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/sdf/layer.h>
@@ -17,16 +11,22 @@
 #include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/usdGeom/camera.h>
 
-#include "stage/StageLoader.h"
-#include "stage/commands/Commands.h"
+#include <StageLoader.h>
+#include <commands/Commands.h>
+#include <commands/Shortcuts.h>
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "LayerEditor.h"
 #include "PrimSpecEditor.h"
 #include "CompositionEditor.h"
 #include "ImGuiHelpers.h"
-#include <Constants.h>
-#include "stage/commands/Shortcuts.h"
+#include "Constants.h"
+
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <array>
+#include <cctype>
 
 struct AddVariantModalDialog : public ModalDialog {
 

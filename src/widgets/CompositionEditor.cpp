@@ -1,15 +1,14 @@
-
+#include "CompositionEditor.h"
+#include "ImGuiHelpers.h"
+#include "ModalDialogs.h"
+#include "FileBrowser.h"
 #include <pxr/usd/sdf/primSpec.h>
 #include <pxr/usd/sdf/reference.h>
 #include <pxr/usd/sdf/payload.h>
-#include "CompositionEditor.h"
-#include "ImGuiHelpers.h"
-#include "stage/ProxyHelpers.h"
-#include "ModalDialogs.h"
-#include "FileBrowser.h"
-#include "stage/commands/Commands.h"
-#include <Constants.h>
-#include "ImGuiHelpers.h"
+#include <ProxyHelpers.h>
+#include <commands/Commands.h>
+#include "Constants.h"
+
 
 // 2 local struct to differentiate Inherit and Specialize which have the same underlying type
 struct Inherit {};

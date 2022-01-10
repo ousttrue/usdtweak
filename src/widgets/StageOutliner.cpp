@@ -1,14 +1,14 @@
-#include <iostream>
+#include "StageOutliner.h"
+#include "ValueEditor.h"
+#include "Constants.h"
+#include "ImGuiHelpers.h"
+#include <Selection.h>
 
 #include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/pcp/layerStack.h>
 
-#include "Gui.h"
-#include "ImGuiHelpers.h"
-#include "StageOutliner.h"
-#include "stage/commands/Commands.h"
-#include "ValueEditor.h"
-#include <Constants.h>
+#include <commands/Commands.h>
+#include <iostream>
 
 ///
 /// Note: ImGuiListClipper can be useful if the hierarchy is huge
@@ -83,7 +83,7 @@ static ImVec4 GetPrimColor(const UsdPrim &prim) {
 }
 
 /// Recursive function to draw a prim and its descendants
-static void DrawPrimTreeNode(const UsdPrim &prim, Selection &selectedPaths) {
+static void DrawPrimTreeNode(const UsdPrim &prim, std::unique_ptr<pxr::HdSelection> &selectedPaths) {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
     const auto &children = prim.GetFilteredChildren(UsdTraverseInstanceProxies(UsdPrimAllPrimsPredicate));
     if (children.empty()) {
@@ -112,7 +112,7 @@ static void DrawPrimTreeNode(const UsdPrim &prim, Selection &selectedPaths) {
         // Get visibility parameter.
         // Is it really useful ???
         UsdGeomImageable imageable(prim);
-        const char* icon = "";
+        const char *icon = "";
         if (imageable) {
             VtValue visible;
             imageable.GetVisibilityAttr().Get(&visible);
@@ -138,7 +138,7 @@ static void DrawPrimTreeNode(const UsdPrim &prim, Selection &selectedPaths) {
 /// It modifies the internal imgui tree graph state.
 /// It uses a hash that must be the same as the node, at the moment the label is the name of the prim
 /// which should be the same as the name on the selected paths
-static void OpenSelectedPaths(Selection &selectedPaths) {
+static void OpenSelectedPaths(std::unique_ptr<pxr::HdSelection> &selectedPaths) {
     ImGuiContext &g = *GImGui;
     ImGuiWindow *window = g.CurrentWindow;
     ImGuiStorage *storage = window->DC.StateStorage;
@@ -155,7 +155,7 @@ static void OpenSelectedPaths(Selection &selectedPaths) {
 }
 
 /// Draw the hierarchy of the stage
-void DrawStageOutliner(UsdStageRefPtr stage, Selection &selectedPaths) {
+void DrawStageOutliner(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selectedPaths) {
     if (!stage)
         return;
     constexpr unsigned int textBufferSize = 512;
@@ -170,7 +170,7 @@ void DrawStageOutliner(UsdStageRefPtr stage, Selection &selectedPaths) {
 
     // Unfold the selected paths.
     // TODO: This might be a behavior we don't want in some situations, so add a way to toggle it
-    static SelectionHash lastSelectionHash = 0;
+    static size_t lastSelectionHash = 0;
     if (UpdateSelectionHash(selectedPaths, lastSelectionHash)) { // We could use the imgui id as well instead of a static ??
         OpenSelectedPaths(selectedPaths);
         // TODO HighlightSelectedPaths();

@@ -1,6 +1,8 @@
 #include "TextEditor.h"
-#include "Gui.h"
-#include "stage/commands/Commands.h"
+#include <commands/Commands.h>
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <imgui_internal.h>
 
 // The following include contains the code which writes usd to text, but it's not
 // distributed with the api

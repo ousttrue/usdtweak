@@ -1,5 +1,5 @@
 
-#include "Gui.h"
+#include <imgui.h>
 #include "ModalDialogs.h"
 
 /// The current and only modal dialog to display

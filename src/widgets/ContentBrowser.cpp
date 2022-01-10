@@ -1,15 +1,15 @@
-
+#include "ContentBrowser.h"
+#include "ImGuiHelpers.h"
+#include "LayerEditor.h" // for DrawLayerMenuItems
+#include "TextFilter.h"
+#include <commands/Commands.h>
+#include <Constants.h>
+#include <pxr/usd/usd/stage.h>
+#include <imgui.h>
+#include <IconsFontAwesome5.h>
 #include <array>
 #include <memory>
 #include <regex>
-#include <pxr/usd/usd/stage.h>
-#include "Gui.h"
-#include "ImGuiHelpers.h"
-#include "ContentBrowser.h"
-#include "LayerEditor.h" // for DrawLayerMenuItems
-#include "stage/commands/Commands.h"
-#include <Constants.h>
-#include "TextFilter.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

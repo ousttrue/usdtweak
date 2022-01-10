@@ -1,6 +1,11 @@
-
-#include <iostream>
-#include <array>
+#include "PrimSpecEditor.h"
+#include "ImGuiHelpers.h"
+#include "CompositionEditor.h"
+#include "ModalDialogs.h"
+#include "FileBrowser.h"
+#include "ValueEditor.h"
+#include "LayerEditor.h"
+#include "VariantEditor.h"
 
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/sdf/layer.h>
@@ -15,17 +20,12 @@
 #include <pxr/usd/sdf/attributeSpec.h>
 #include <pxr/usd/sdf/propertySpec.h>
 
-#include "ImGuiHelpers.h"
-#include "PrimSpecEditor.h"
-#include "CompositionEditor.h"
-#include "ModalDialogs.h"
-#include "FileBrowser.h"
-#include "stage/commands/Commands.h"
+#include <commands/Commands.h>
+#include <ProxyHelpers.h>
 #include <Constants.h>
-#include "ValueEditor.h"
-#include "LayerEditor.h"
-#include "VariantEditor.h"
-#include "stage/ProxyHelpers.h"
+
+#include <iostream>
+#include <array>
 
 //// NOTES: Sdf API: Removing a variantSet and cleaning it from the list editing
 //// -> https://groups.google.com/g/usd-interest/c/OeqtGl_1H-M/m/xjCx3dT9EgAJ

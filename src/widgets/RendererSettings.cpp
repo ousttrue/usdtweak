@@ -2,7 +2,7 @@
 #include <map>
 #include "RendererSettings.h"
 #include "ValueEditor.h"
-#include "Gui.h"
+#include <imgui.h>
 
 // We keep the currently selected AOV per engine here as there is it not really store in UsdImagingGLEngine.
 // When setting a color aov, the engine adds multiple other aov to render, in short there is no easy way to know

@@ -1,4 +1,4 @@
-#include "Dockspace.h"
+#include <Dockspace.h>
 #include "CommandLineOptions.h"
 #include "window.h"
 #include <StageLoader.h>
@@ -6,22 +6,23 @@
 #include <HydraRenderer.h>
 #include <Constants.h>
 //
-#include "widgets/PropertyEditor.h"
-#include "widgets/StageOutliner.h"
-#include "widgets/Timeline.h"
-#include "widgets/LayerEditor.h"
-#include "widgets/LayerHierarchyEditor.h"
-#include "widgets/LayerEditor.h"
-#include "widgets/ContentBrowser.h"
-#include "widgets/PrimSpecEditor.h"
-#include "widgets/LayerEditor.h"
-#include "widgets/TextEditor.h"
-#include "widgets/ModalDialogs.h"
-#include "widgets/FileBrowser.h"
+#include <PropertyEditor.h>
+#include <StageOutliner.h>
+#include <Timeline.h>
+#include <LayerEditor.h>
+#include <LayerHierarchyEditor.h>
+#include <LayerEditor.h>
+#include <ContentBrowser.h>
+#include <PrimSpecEditor.h>
+#include <LayerEditor.h>
+#include <TextEditor.h>
+#include <ModalDialogs.h>
+#include <FileBrowser.h>
 //
 #include <pxr/base/arch/fileSystem.h>
 #include <pxr/usd/sdf/fileFormat.h>
 #include <imgui.h>
+#include <IconsFontAwesome5.h>
 #include <iostream>
 
 #ifdef WANTS_PYTHON

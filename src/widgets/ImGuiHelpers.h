@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Gui.h"
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <imgui_internal.h>
+#include <IconsFontAwesome5.h>
 
 /// One liner for creating multiple calls to ImGui::TableSetupColumn
 template <typename T, typename... Args> inline void TableSetupColumns(T t, Args... args) {

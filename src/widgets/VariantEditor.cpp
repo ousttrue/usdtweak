@@ -1,11 +1,11 @@
+#include "VariantEditor.h"
+#include "ImGuiHelpers.h"
+#include "Constants.h"
+#include <commands/Commands.h>
+#include <ProxyHelpers.h>
 #include <pxr/usd/sdf/variantSpec.h>
 #include <pxr/usd/sdf/variantSetSpec.h>
-#include "VariantEditor.h"
-#include "Gui.h"
-#include <Constants.h>
-#include "stage/commands/Commands.h"
-#include "stage/ProxyHelpers.h"
-#include "ImGuiHelpers.h"
+#include <imgui.h>
 
 static void DrawVariantSelectionMiniButton(SdfPrimSpecHandle &primSpec, const std::string &variantSetName, int &buttonId) {
     ScopedStyleColor style(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0), ImGuiCol_Button, ImVec4(TransparentColor));

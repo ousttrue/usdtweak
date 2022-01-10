@@ -1,7 +1,7 @@
-#include <iostream>
 #include "Timeline.h"
-#include "stage/commands/Commands.h"
-#include "Gui.h"
+#include <commands/Commands.h>
+#include <imgui.h>
+#include <iostream>
 
 // The easiest version of a timeline: a slider
 void DrawTimeline(UsdStageRefPtr stage, UsdTimeCode &currentTimeCode) {

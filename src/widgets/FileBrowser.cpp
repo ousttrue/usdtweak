@@ -3,11 +3,8 @@
 /// it should be improved to avoid using globals,
 /// split the ui and filesystem code, remove the polling timer, etc.
 
-#include <iostream>
-#include <functional>
-#include <ctime>
-#include <chrono>
-
+#include "FileBrowser.h"
+#include "ImGuiHelpers.h"
 
 #if defined(__cplusplus) && __cplusplus >= 201703L && defined(__has_include) && __has_include(<filesystem>)
 #include <filesystem>
@@ -18,10 +15,11 @@ namespace fs = std::filesystem;
 namespace fs = ghc::filesystem;
 #endif
 
-#include "FileBrowser.h"
 #include <Constants.h>
-#include "ImGuiHelpers.h"
-#include "Gui.h"
+#include <iostream>
+#include <functional>
+#include <ctime>
+#include <chrono>
 
 namespace clk = std::chrono;
 

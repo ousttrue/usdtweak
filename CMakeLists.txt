@@ -100,4 +100,4 @@ target_compile_options(
             $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)
 
 # usdtweak
-subdirs(src app)
+subdirs(src)
