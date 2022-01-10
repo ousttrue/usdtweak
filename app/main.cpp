@@ -146,7 +146,7 @@ void Setup(Dockspace *dockspace, Editor *self, Viewport *viewport) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
             viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-            viewport->Draw();
+            viewport->Draw(self->GetCurrentStage());
         }
         ImGui::End();
     }));
@@ -274,10 +274,6 @@ int main(int argc, const char **argv) {
         // Resource will load the font/textures/settings
         Editor editor;
         Viewport viewport;
-        editor.OnStageChanged = [&viewport](auto stage)
-        {
-            viewport.SetCurrentStage(stage);
-        };
 
         Setup(&dockspace, &editor, &viewport);
 
@@ -304,10 +300,7 @@ int main(int argc, const char **argv) {
         while (window->newFrame(&width, &height)) {
 
             // render to texture
-            viewport.Update();
-            viewport.Render();
-
-            // editor.HydraRender();
+            viewport.Render(editor.GetCurrentStage());
 
             // Render GUI next
             glViewport(0, 0, width, height);

@@ -48,21 +48,21 @@ void DrawGLLights(GlfSimpleLightVector &lights) {
 static SdfPath perspectiveCameraPath("/usdtweak/cameras/cameraPerspective");
 
 /// Draw a camera selection
-void Viewport::DrawCameraList() {
+void Viewport::DrawCameraList(UsdStageRefPtr stage) {
     // TODO: the viewport cameras and the stage camera should live in different lists
     constexpr char const *perspectiveCameraName = "Perspective";
     if (ImGui::BeginListBox("##CameraList")) {
         // OpenGL Cameras
         if (ImGui::Selectable(perspectiveCameraName, GetCameraPath() == perspectiveCameraPath)) {
-            SetCameraPath(perspectiveCameraPath);
+            SetCameraPath(stage, perspectiveCameraPath);
         }
-        if (GetCurrentStage()) {
-            UsdPrimRange range = GetCurrentStage()->Traverse();
+        if (stage) {
+            UsdPrimRange range = stage->Traverse();
             for (const auto &prim : range) {
                 if (prim.IsA<UsdGeomCamera>()) {
                     const bool isSelected = (prim.GetPath() == GetCameraPath());
                     if (ImGui::Selectable(prim.GetName().data(), isSelected)) {
-                        SetCameraPath(prim.GetPath());
+                        SetCameraPath(stage, prim.GetPath());
                     }
                 }
             }
@@ -79,8 +79,8 @@ void Viewport::DrawCameraList() {
     }
 }
 
-Viewport::Viewport(UsdStageRefPtr stage)
-    : _stage(stage), _cameraManipulator({InitialWindowWidth, InitialWindowHeight}),
+Viewport::Viewport()
+    : _cameraManipulator({InitialWindowWidth, InitialWindowHeight}),
       _currentEditingState(new MouseHoverManipulator()), _activeManipulator(&_positionManipulator),
       _viewportSize(InitialWindowWidth, InitialWindowHeight), _selectedCameraPath(perspectiveCameraPath),
       _renderCamera(&_perspectiveCamera) {
@@ -157,12 +157,12 @@ Viewport::~Viewport() {
 }
 
 /// Draw the viewport widget
-void Viewport::Draw() {
+void Viewport::Draw(UsdStageRefPtr stage) {
     ImVec2 wsize = ImGui::GetWindowSize();
     ImGui::Button("\xef\x80\xb0 Cameras");
     ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonLeft;
     if (_renderer && ImGui::BeginPopupContextItem(nullptr, flags)) {
-        DrawCameraList();
+        DrawCameraList(stage);
         ImGui::EndPopup();
     }
     ImGui::SameLine();
@@ -210,7 +210,7 @@ void Viewport::Draw() {
         //    ImGui::Button("Deactivate");
         //    ImGui::EndPopup();
         //}
-        HandleManipulationEvents();
+        HandleManipulationEvents(stage);
         HandleKeyboardShortcut();
 
         DrawManipulatorToolbox(cursorPos);
@@ -257,27 +257,27 @@ void Viewport::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
 void Viewport::SetSize(int width, int height) { _viewportSize = GfVec2i(width, height); }
 
 /// Frane the viewport using the bounding box of the selection
-void Viewport::FrameSelection(const Selection &selection) { // Camera manipulator ???
-    if (GetCurrentStage() && !IsSelectionEmpty(selection)) {
+void Viewport::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &selection) { // Camera manipulator ???
+    if (stage && !IsSelectionEmpty(selection)) {
         UsdGeomBBoxCache bboxcache(_renderparams->frame, UsdGeomImageable::GetOrderedPurposeTokens());
         GfBBox3d bbox;
         for (const auto &primPath : GetSelectedPaths(selection)) {
-            bbox = GfBBox3d::Combine(bboxcache.ComputeWorldBound(GetCurrentStage()->GetPrimAtPath(primPath)), bbox);
+            bbox = GfBBox3d::Combine(bboxcache.ComputeWorldBound(stage->GetPrimAtPath(primPath)), bbox);
         }
-        auto defaultPrim = GetCurrentStage()->GetDefaultPrim();
+        auto defaultPrim = stage->GetDefaultPrim();
         _cameraManipulator.FrameBoundingBox(GetCurrentCamera(), bbox);
     }
 }
 
 /// Frame the viewport using the bounding box of the root prim
-void Viewport::FrameRootPrim() {
-    if (GetCurrentStage()) {
+void Viewport::FrameRootPrim(UsdStageRefPtr stage) {
+    if (stage) {
         UsdGeomBBoxCache bboxcache(_renderparams->frame, UsdGeomImageable::GetOrderedPurposeTokens());
-        auto defaultPrim = GetCurrentStage()->GetDefaultPrim();
+        auto defaultPrim = stage->GetDefaultPrim();
         if (defaultPrim) {
             _cameraManipulator.FrameBoundingBox(GetCurrentCamera(), bboxcache.ComputeWorldBound(defaultPrim));
         } else {
-            auto rootPrim = GetCurrentStage()->GetPrimAtPath(SdfPath("/"));
+            auto rootPrim = stage->GetPrimAtPath(SdfPath("/"));
             _cameraManipulator.FrameBoundingBox(GetCurrentCamera(), bboxcache.ComputeWorldBound(rootPrim));
         }
     }
@@ -348,7 +348,7 @@ void Viewport::HandleKeyboardShortcut() {
     }
 }
 
-void Viewport::HandleManipulationEvents() {
+void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage) {
 
     ImGuiContext *g = ImGui::GetCurrentContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -369,18 +369,18 @@ void Viewport::HandleManipulationEvents() {
         /// where every manipulator/editor is a state
         if (!_currentEditingState) {
             _currentEditingState = GetManipulator<MouseHoverManipulator>();
-            _currentEditingState->OnBeginEdition(*this);
+            _currentEditingState->OnBeginEdition(stage, *this);
         }
 
-        auto newState = _currentEditingState->OnUpdate(*this);
+        auto newState = _currentEditingState->OnUpdate(stage, *this);
         if (newState != _currentEditingState) {
-            _currentEditingState->OnEndEdition(*this);
+            _currentEditingState->OnEndEdition(stage, *this);
             _currentEditingState = newState;
-            _currentEditingState->OnBeginEdition(*this);
+            _currentEditingState->OnBeginEdition(stage, *this);
         }
     } else { // Mouse is outside of the viewport, reset the state
         if (_currentEditingState) {
-            _currentEditingState->OnEndEdition(*this);
+            _currentEditingState->OnEndEdition(stage, *this);
             _currentEditingState = nullptr;
         }
     }
@@ -388,14 +388,14 @@ void Viewport::HandleManipulationEvents() {
 
 GfCamera &Viewport::GetCurrentCamera() { return *_renderCamera; }
 const GfCamera &Viewport::GetCurrentCamera() const { return *_renderCamera; }
-UsdGeomCamera Viewport::GetUsdGeomCamera() { return UsdGeomCamera::Get(GetCurrentStage(), GetCameraPath()); }
+UsdGeomCamera Viewport::GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage) { return UsdGeomCamera::Get(stage, GetCameraPath()); }
 
-void Viewport::SetCameraPath(const SdfPath &cameraPath) {
+void Viewport::SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath) {
     _selectedCameraPath = cameraPath;
 
     _renderCamera = &_perspectiveCamera; // by default
-    if (GetCurrentStage() && _renderparams) {
-        const auto selectedCameraPrim = UsdGeomCamera::Get(GetCurrentStage(), _selectedCameraPath);
+    if (stage && _renderparams) {
+        const auto selectedCameraPrim = UsdGeomCamera::Get(stage, _selectedCameraPath);
         if (selectedCameraPrim) {
             _renderCamera = &_stageCamera;
             _stageCamera = selectedCameraPrim.GetCamera(_renderparams->frame);
@@ -409,7 +409,7 @@ template <typename HasPositionT> inline void CopyCameraPosition(const GfCamera &
     object.SetPosition(lightPos);
 }
 
-void Viewport::Render() {
+void Viewport::Render(UsdStageRefPtr stage) {
     GfVec2i renderSize = _drawTarget->GetSize();
     int width = renderSize[0];
     int height = renderSize[1];
@@ -425,7 +425,7 @@ void Viewport::Render() {
 
     glViewport(0, 0, width, height);
 
-    if (_renderer && GetCurrentStage()) {
+    if (_renderer && stage) {
         // Render hydra
         // Set camera and lighting state
         CopyCameraPosition(GetCurrentCamera(), _lights[0]);
@@ -438,7 +438,7 @@ void Viewport::Render() {
         // else set camera state
         _renderer->SetCameraState(GetCurrentCamera().GetFrustum().ComputeViewMatrix(),
                                   GetCurrentCamera().GetFrustum().ComputeProjectionMatrix());
-        _renderer->Render(GetCurrentStage()->GetPseudoRoot(), *_renderparams);
+        _renderer->Render(stage->GetPseudoRoot(), *_renderparams);
     } else {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -447,7 +447,7 @@ void Viewport::Render() {
     _grid.Render(*this);
 
     // Draw active manipulator
-    GetActiveManipulator().OnDrawFrame(*this);
+    GetActiveManipulator().OnDrawFrame(stage, *this);
 
     _drawTarget->Unbind();
 }
@@ -459,30 +459,30 @@ void Viewport::SetCurrentTimeCode(const UsdTimeCode &tc) {
 }
 
 /// Update anything that could have change after a frame render
-void Viewport::Update() {
-    if (GetCurrentStage()) {
-        auto whichRenderer = _renderers.find(GetCurrentStage()); /// We expect a very limited number of opened stages
+void Viewport::Update(UsdStageRefPtr stage) {
+    if (stage) {
+        auto whichRenderer = _renderers.find(stage); /// We expect a very limited number of opened stages
         if (whichRenderer == _renderers.end()) {
             SdfPathVector excludedPaths;
-            _renderer = new UsdImagingGLEngine(GetCurrentStage()->GetPseudoRoot().GetPath(), excludedPaths);
+            _renderer = new UsdImagingGLEngine(stage->GetPseudoRoot().GetPath(), excludedPaths);
             if (_renderers.empty()) {
-                FrameRootPrim();
+                FrameRootPrim(stage);
             }
-            _renderers[GetCurrentStage()] = _renderer;
-            _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(GetCurrentStage()) == "Z");
-            _grid.SetZIsUp(UsdGeomGetStageUpAxis(GetCurrentStage()) == "Z");
+            _renderers[stage] = _renderer;
+            _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
+            _grid.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
             InitializeRendererAov(*_renderer);
         } else if (whichRenderer->second != _renderer) {
             _renderer = whichRenderer->second;
-            _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(GetCurrentStage()) == "Z");
+            _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
             // TODO: should reset the camera otherwise, depending on the position of the camera, the transform is incorrect
-            _grid.SetZIsUp(UsdGeomGetStageUpAxis(GetCurrentStage()) == "Z");
+            _grid.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
             // TODO: the selection is also different per stage
             //_selection =
         }
         // Camera -- TODO: is it slow to query the camera at each frame ?
         //                 the manipulator does is as well
-        const auto stageCameraPrim = GetUsdGeomCamera();
+        const auto stageCameraPrim = GetUsdGeomCamera(stage);
         if (stageCameraPrim) {
             _stageCamera = stageCameraPrim.GetCamera(GetCurrentTimeCode());
             _renderCamera = &_stageCamera;
@@ -504,13 +504,13 @@ void Viewport::Update() {
         _renderer->SetSelected(GetSelectedPaths(_selection));
 
         // Tell the manipulators the selection has changed
-        _positionManipulator.OnSelectionChange(*this);
-        _rotationManipulator.OnSelectionChange(*this);
-        _scaleManipulator.OnSelectionChange(*this);
+        _positionManipulator.OnSelectionChange(stage, *this);
+        _rotationManipulator.OnSelectionChange(stage, *this);
+        _scaleManipulator.OnSelectionChange(stage, *this);
     }
 }
 
-bool Viewport::TestIntersection(GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath,
+bool Viewport::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath,
                                 int &outHitInstanceIndex) {
 
     GfVec2i renderSize = _drawTarget->GetSize();
@@ -523,7 +523,7 @@ bool Viewport::TestIntersection(GfVec2d clickedPoint, SdfPath &outHitPrimPath, S
     GfVec3d outHitNormal;
     return (_renderparams && _renderer &&
             _renderer->TestIntersection(GetCurrentCamera().GetFrustum().ComputeViewMatrix(),
-                                        pixelFrustum.ComputeProjectionMatrix(), GetCurrentStage()->GetPseudoRoot(),
+                                        pixelFrustum.ComputeProjectionMatrix(), stage->GetPseudoRoot(),
                                         *_renderparams, &outHitPoint, &outHitNormal, &outHitPrimPath, &outHitInstancerPath,
                                         &outHitInstanceIndex));
 }

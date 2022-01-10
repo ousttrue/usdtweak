@@ -30,11 +30,6 @@ void Editor::SetCurrentStage(UsdStageRefPtr stage) {
     if (!GetCurrentLayer() && _currentStage) {
         SetCurrentLayer(_currentStage->GetRootLayer());
     }
-    // TODO multiple viewport management
-    if(OnStageChanged)
-    {
-        OnStageChanged(stage);
-    }
 }
 
 void Editor::SetCurrentLayer(SdfLayerRefPtr layer) {

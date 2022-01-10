@@ -1,7 +1,5 @@
 #pragma once
 
-PXR_NAMESPACE_USING_DIRECTIVE
-
 #include "Manipulator.h"
 
 /// The selection manipulator will help selecting a region of the viewport, drawing a rectangle.
@@ -10,9 +8,9 @@ class SelectionManipulator : public Manipulator {
     SelectionManipulator() = default;
     ~SelectionManipulator() = default;
 
-    void OnDrawFrame(const Viewport &) override;
+    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
 
-    Manipulator *OnUpdate(Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) override;
 
     // Picking modes
     enum class PickMode { Prim, Model, Assembly };

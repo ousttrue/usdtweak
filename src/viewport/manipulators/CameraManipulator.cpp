@@ -1,25 +1,25 @@
-#include <pxr/usd/usdGeom/camera.h>
 #include "CameraManipulator.h"
-#include "Viewport.h"
+#include "viewport/Viewport.h"
+#include <pxr/usd/usdGeom/camera.h>
 #include "commands/Commands.h"
-#include "Gui.h"
+#include <imgui.h>
 
 CameraManipulator::CameraManipulator(const GfVec2i &viewportSize, bool isZUp) : CameraRig(viewportSize, isZUp) {}
 
-void CameraManipulator::OnBeginEdition(Viewport &viewport) {
-    _stageCamera = viewport.GetUsdGeomCamera();
+void CameraManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+    _stageCamera = viewport.GetUsdGeomCamera(stage);
     if (_stageCamera) {
-        BeginEdition(viewport.GetCurrentStage());
+        BeginEdition(stage);
     }
 }
 
-void CameraManipulator::OnEndEdition(Viewport &viewport) {
+void CameraManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     if (_stageCamera) {
         EndEdition();
     }
 }
 
-Manipulator *CameraManipulator::OnUpdate(Viewport &viewport) {
+Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     auto &cameraManipulator = viewport.GetCameraManipulator();
     ImGuiIO &io = ImGui::GetIO();
 

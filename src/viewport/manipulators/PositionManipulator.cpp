@@ -4,8 +4,8 @@
 #include "Constants.h"
 #include "PositionManipulator.h"
 #include "GeometricFunctions.h"
-#include "Viewport.h"
-#include "Gui.h"
+#include "viewport/Viewport.h"
+#include <imgui.h>
 #include "commands/Commands.h"
 #include "GlslCode.h"
 
@@ -116,7 +116,7 @@ bool PositionManipulator::CompileShaders() {
     return true;
 }
 
-bool PositionManipulator::IsMouseOver(const Viewport &viewport) {
+bool PositionManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const auto &frustum = viewport.GetCurrentCamera().GetFrustum();
@@ -161,10 +161,10 @@ bool PositionManipulator::IsMouseOver(const Viewport &viewport) {
 }
 
 // Same as rotation manipulator now -- TODO : share in a common class
-void PositionManipulator::OnSelectionChange(Viewport &viewport) {
+void PositionManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     auto &selection = viewport.GetSelection();
     auto primPath = GetSelectedPath(selection);
-    _xformAPI = UsdGeomXformCommonAPI(viewport.GetCurrentStage()->GetPrimAtPath(primPath));
+    _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
 
 GfMatrix4d PositionManipulator::ComputeManipulatorToWorldTransform(const Viewport &viewport) {
@@ -189,7 +189,7 @@ GfMatrix4d PositionManipulator::ComputeManipulatorToWorldTransform(const Viewpor
 }
 
 // TODO: same as rotation manipulator, share in a base class
-void PositionManipulator::OnDrawFrame(const Viewport &viewport) {
+void PositionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const auto &camera = viewport.GetCurrentCamera();
@@ -233,7 +233,7 @@ void PositionManipulator::OnDrawFrame(const Viewport &viewport) {
     }
 }
 
-void PositionManipulator::OnBeginEdition(Viewport &viewport) {
+void PositionManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     // Save original translation values
     GfVec3f scale;
     GfVec3f pivot;
@@ -246,10 +246,10 @@ void PositionManipulator::OnBeginEdition(Viewport &viewport) {
     _axisLine = GfLine(objectTransform.ExtractTranslation(), objectTransform.GetRow3(_selectedAxis));
     ProjectMouseOnAxis(viewport, _originMouseOnAxis);
 
-    BeginEdition(viewport.GetCurrentStage());
+    BeginEdition(stage);
 }
 
-Manipulator *PositionManipulator::OnUpdate(Viewport &viewport) {
+Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
 
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
@@ -274,7 +274,7 @@ Manipulator *PositionManipulator::OnUpdate(Viewport &viewport) {
     return this;
 };
 
-void PositionManipulator::OnEndEdition(Viewport &) { EndEdition(); };
+void PositionManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) { EndEdition(); };
 
 ///
 void PositionManipulator::ProjectMouseOnAxis(const Viewport &viewport, GfVec3d &linePoint) {

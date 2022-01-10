@@ -49,8 +49,6 @@ class Editor {
     void ImportStage(const std::string &path, bool openLoaded = true);
     void SaveCurrentLayerAs(const std::string &path);
 
-    StageChangedFunc OnStageChanged;
-
   private:
     /// Make sure the layer is correctly in the list of layers,
     /// makes it current and show the appropriate windows

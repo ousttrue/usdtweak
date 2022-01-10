@@ -5,13 +5,13 @@
 /// has grown too much and doing too many thing
 ///
 #include <map>
-#include "Manipulator.h"
-#include "CameraManipulator.h"
-#include "PositionManipulator.h"
-#include "MouseHoverManipulator.h"
-#include "SelectionManipulator.h"
-#include "RotationManipulator.h"
-#include "ScaleManipulator.h"
+#include "manipulators/Manipulator.h"
+#include "manipulators/CameraManipulator.h"
+#include "manipulators/PositionManipulator.h"
+#include "manipulators/MouseHoverManipulator.h"
+#include "manipulators/SelectionManipulator.h"
+#include "manipulators/RotationManipulator.h"
+#include "manipulators/ScaleManipulator.h"
 #include "Selection.h"
 #include "Grid.h"
 #include <pxr/imaging/glf/drawTarget.h>
@@ -23,7 +23,7 @@
 
 class Viewport final {
   public:
-    Viewport(UsdStageRefPtr stage = {});
+    Viewport();
     ~Viewport();
 
     // Delete copy
@@ -31,19 +31,21 @@ class Viewport final {
     Viewport &operator=(const Viewport &) = delete;
 
     /// Render hydra
-    void Render();
+    void Render(UsdStageRefPtr stage);
 
+private:
     /// Update internal data: selection, current renderer
-    void Update();
+    void Update(UsdStageRefPtr stage);
 
+public:
     /// Set the hydra render size
     void SetSize(int width, int height);
 
     /// Draw the full widget
-    void Draw();
+    void Draw(UsdStageRefPtr stage);
 
   private:
-    void DrawCameraList();
+    void DrawCameraList(UsdStageRefPtr stage);
 
   public:
     /// Returns the time code of this viewport
@@ -51,8 +53,8 @@ class Viewport final {
     void SetCurrentTimeCode(const UsdTimeCode &tc);
 
     /// Camera framing
-    void FrameSelection(const Selection &);
-    void FrameRootPrim();
+    void FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &);
+    void FrameRootPrim(UsdStageRefPtr stage);
 
     // Cameras
     /// Return the camera used to render the viewport
@@ -60,15 +62,15 @@ class Viewport final {
     const GfCamera &GetCurrentCamera() const;
 
     // Set the camera path
-    void SetCameraPath(const SdfPath &cameraPath);
+    void SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath);
     const SdfPath &GetCameraPath() { return _selectedCameraPath; }
     // Returns a UsdGeom camera if the selected camera is in the stage
-    UsdGeomCamera GetUsdGeomCamera();
+    UsdGeomCamera GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage);
 
     CameraManipulator &GetCameraManipulator() { return _cameraManipulator; }
 
     // Picking
-    bool TestIntersection(GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
+    bool TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
     GfVec2d GetPickingBoundarySize() const;
 
     // Utility function for compute a scale for the manipulators. It uses the distance between the camera
@@ -97,18 +99,13 @@ class Viewport final {
 
     GfVec2d GetMousePosition() const { return _mousePosition; }
 
-    UsdStageRefPtr GetCurrentStage() { return _stage; }
-    const UsdStageRefPtr GetCurrentStage() const { return _stage; };
-
-    void SetCurrentStage(UsdStageRefPtr stage) { _stage = stage; }
-
     Selection &GetSelection() { return _selection; }
 
     SelectionManipulator &GetSelectionManipulator() { return _selectionManipulator; }
 
     /// Handle events is implemented as a finite state machine.
     /// The state are simply the current manipulator used.
-    void HandleManipulationEvents();
+    void HandleManipulationEvents(const pxr::UsdStageRefPtr &stage);
     void HandleKeyboardShortcut();
 
   private:
@@ -142,8 +139,6 @@ class Viewport final {
     GfVec2i _viewportSize;
     GfVec2d _mousePosition;
     Grid _grid;
-
-    UsdStageRefPtr _stage;
 
     // Renderer
     GLuint _textureId = 0;

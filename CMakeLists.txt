@@ -87,6 +87,7 @@ target_link_libraries(
             usd_work.lib)
 target_link_directories(usd INTERFACE "$<$<CONFIG:Debug>:${DEBUG_DIR}/lib>"
                         "$<$<CONFIG:Release>:${RELEASE_DIR}/lib>")
+target_compile_definitions(usd INTERFACE /wd4244)
 
 # usdtweak
 subdirs(src app)

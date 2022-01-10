@@ -4,8 +4,8 @@
 #include "Constants.h"
 #include "ScaleManipulator.h"
 #include "GeometricFunctions.h"
-#include "Viewport.h"
-#include "Gui.h"
+#include "viewport/Viewport.h"
+#include <imgui.h>
 #include "commands/Commands.h"
 #include "GlslCode.h"
 
@@ -102,7 +102,7 @@ bool ScaleManipulator::CompileShaders() {
     return true;
 }
 
-bool ScaleManipulator::IsMouseOver(const Viewport &viewport) {
+bool ScaleManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const auto &frustum = viewport.GetCurrentCamera().GetFrustum();
@@ -147,10 +147,10 @@ bool ScaleManipulator::IsMouseOver(const Viewport &viewport) {
 }
 
 // Same as rotation manipulator now -- TODO : share in a common class
-void ScaleManipulator::OnSelectionChange(Viewport &viewport) {
+void ScaleManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     auto &selection = viewport.GetSelection();
     auto primPath = GetSelectedPath(selection);
-    _xformAPI = UsdGeomXformCommonAPI(viewport.GetCurrentStage()->GetPrimAtPath(primPath));
+    _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
 
 GfMatrix4d ScaleManipulator::ComputeManipulatorToWorldTransform(const Viewport &viewport) {
@@ -176,7 +176,7 @@ GfMatrix4d ScaleManipulator::ComputeManipulatorToWorldTransform(const Viewport &
 }
 
 // TODO: same as rotation manipulator, share in a base class
-void ScaleManipulator::OnDrawFrame(const Viewport &viewport) {
+void ScaleManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const auto &camera = viewport.GetCurrentCamera();
@@ -220,7 +220,7 @@ void ScaleManipulator::OnDrawFrame(const Viewport &viewport) {
     }
 }
 
-void ScaleManipulator::OnBeginEdition(Viewport &viewport) {
+void ScaleManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     // Save original translation values
     GfVec3d translation;
     GfVec3f pivot;
@@ -233,10 +233,10 @@ void ScaleManipulator::OnBeginEdition(Viewport &viewport) {
     _axisLine = GfLine(objectTransform.ExtractTranslation(), objectTransform.GetRow3(_selectedAxis));
     ProjectMouseOnAxis(viewport, _originMouseOnAxis);
 
-    BeginEdition(viewport.GetCurrentStage());
+    BeginEdition(stage);
 }
 
-Manipulator *ScaleManipulator::OnUpdate(Viewport &viewport) {
+Manipulator *ScaleManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
 
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
@@ -263,7 +263,7 @@ Manipulator *ScaleManipulator::OnUpdate(Viewport &viewport) {
     return this;
 };
 
-void ScaleManipulator::OnEndEdition(Viewport &) { EndEdition(); };
+void ScaleManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) { EndEdition(); };
 
 ///
 void ScaleManipulator::ProjectMouseOnAxis(const Viewport &viewport, GfVec3d &linePoint) {

@@ -18,18 +18,18 @@ class PositionManipulator : public Manipulator {
 
     /// From ViewportEditor
     /// Note: a Manipulator does not store a viewport as it can be rendered in multiple viewport at the same time
-    void OnBeginEdition(Viewport &) override;
-    Manipulator *OnUpdate(Viewport &) override;
-    void OnEndEdition(Viewport &) override;
+    void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
 
     /// Return true if the mouse is over this manipulator for the viewport passed in argument
-    bool IsMouseOver(const Viewport &) override;
+    bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
 
     /// Draw the translate manipulator as seen in the viewport
-    void OnDrawFrame(const Viewport &) override;
+    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
 
     /// Called when the viewport changes its selection
-    void OnSelectionChange(Viewport &) override;
+    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &) override;
 
     typedef enum { // use class enum ??
         XAxis = 0,

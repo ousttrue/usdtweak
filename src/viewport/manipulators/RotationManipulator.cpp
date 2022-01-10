@@ -6,7 +6,7 @@
 #include "Constants.h"
 #include "RotationManipulator.h"
 #include "GeometricFunctions.h"
-#include "Viewport.h"
+#include "viewport/Viewport.h"
 #include "Gui.h"
 #include "commands/Commands.h"
 #include "GlslCode.h"
@@ -161,7 +161,7 @@ static bool IntersectsUnitCircle(const GfVec3d &planeNormal3d, const GfVec3d &pl
     return false;
 }
 
-bool RotationManipulator::IsMouseOver(const Viewport &viewport) {
+bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const GfVec2d mousePosition = viewport.GetMousePosition();
@@ -191,11 +191,11 @@ bool RotationManipulator::IsMouseOver(const Viewport &viewport) {
     return false;
 }
 
-void RotationManipulator::OnSelectionChange(Viewport &viewport) {
+void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     // TODO: we should set here if the new selection will be editable or not
     auto &selection = viewport.GetSelection();
     auto primPath = GetSelectedPath(selection);
-    _xformAPI = UsdGeomXformCommonAPI(viewport.GetCurrentStage()->GetPrimAtPath(primPath));
+    _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
 
 GfMatrix4d RotationManipulator::ComputeManipulatorToWorldTransform(const Viewport &viewport) {
@@ -224,7 +224,7 @@ GfMatrix4d RotationManipulator::ComputeManipulatorToWorldTransform(const Viewpor
     return GfMatrix4d(1.0);
 }
 
-void RotationManipulator::OnDrawFrame(const Viewport &viewport) {
+void RotationManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
 
     if (_xformAPI) {
         const auto &camera = viewport.GetCurrentCamera();
@@ -286,7 +286,7 @@ GfVec3d RotationManipulator::ComputeClockHandVector(Viewport &viewport) {
     return GfVec3d();
 }
 
-void RotationManipulator::OnBeginEdition(Viewport &viewport) {
+void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     if (_xformAPI) {
 
         const auto manipulatorCoordinates = ComputeManipulatorToWorldTransform(viewport);
@@ -315,10 +315,10 @@ void RotationManipulator::OnBeginEdition(Viewport &viewport) {
             UsdGeomXformOp::GetOpTransform(UsdGeomXformCommonAPI::ConvertRotationOrderToOpType(rotOrder), VtValue(rotation));
         ;
     }
-    BeginEdition(viewport.GetCurrentStage());
+    BeginEdition(stage);
 }
 
-Manipulator *RotationManipulator::OnUpdate(Viewport &viewport) {
+Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
     }
@@ -371,7 +371,7 @@ Manipulator *RotationManipulator::OnUpdate(Viewport &viewport) {
     return this;
 };
 
-void RotationManipulator::OnEndEdition(Viewport &) { EndEdition(); }
+void RotationManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) { EndEdition(); }
 
 // TODO code should be shared with position manipulator
 UsdTimeCode RotationManipulator::GetEditionTimeCode(const Viewport &viewport) {

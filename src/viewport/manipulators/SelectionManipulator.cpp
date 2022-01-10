@@ -1,7 +1,7 @@
 #include <pxr/usd/kind/registry.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/prim.h>
-#include "Viewport.h"
+#include "viewport/Viewport.h"
 #include "SelectionManipulator.h"
 #include "Gui.h"
 #include "imgui.h"
@@ -33,16 +33,16 @@ bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &
     return false;
 }
 
-Manipulator *SelectionManipulator::OnUpdate(Viewport &viewport) {
+Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
     Selection &selection = viewport.GetSelection();
     auto mousePosition = viewport.GetMousePosition();
     SdfPath outHitPrimPath;
     SdfPath outHitInstancerPath;
     int outHitInstanceIndex = 0;
-    viewport.TestIntersection(mousePosition, outHitPrimPath, outHitInstancerPath, outHitInstanceIndex);
+    viewport.TestIntersection(stage, mousePosition, outHitPrimPath, outHitInstancerPath, outHitInstanceIndex);
     if (!outHitPrimPath.IsEmpty()) {
-        if (viewport.GetCurrentStage()) {
-            while (!IsPickablePath(*viewport.GetCurrentStage(), outHitPrimPath)) {
+        if (stage) {
+            while (!IsPickablePath(*stage, outHitPrimPath)) {
                 outHitPrimPath = outHitPrimPath.GetParentPath();
             }
         }
@@ -59,7 +59,7 @@ Manipulator *SelectionManipulator::OnUpdate(Viewport &viewport) {
     return viewport.GetManipulator<MouseHoverManipulator>();
 }
 
-void SelectionManipulator::OnDrawFrame(const Viewport &) {
+void SelectionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) {
     // Draw a rectangle for the selection
 }
 

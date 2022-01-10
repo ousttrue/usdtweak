@@ -21,28 +21,28 @@ add_library(
   commands/UndoLayerStateDelegate.h
   viewport/GridVert.cpp
   viewport/GridFrag.cpp
-  viewport/ManipulatorVert.cpp
-  viewport/ManipulatorFrag.cpp
   viewport/Selection.cpp
   viewport/Selection.h
-  viewport/CameraManipulator.cpp
-  viewport/CameraManipulator.h
-  viewport/CameraRig.cpp
-  viewport/CameraRig.h
   viewport/Grid.cpp
   viewport/Grid.h
-  viewport/Manipulator.cpp
-  viewport/Manipulator.h
-  viewport/MouseHoverManipulator.cpp
-  viewport/MouseHoverManipulator.h
-  viewport/PositionManipulator.cpp
-  viewport/PositionManipulator.h
-  viewport/RotationManipulator.cpp
-  viewport/RotationManipulator.h
-  viewport/ScaleManipulator.cpp
-  viewport/ScaleManipulator.h
-  viewport/SelectionManipulator.cpp
-  viewport/SelectionManipulator.h
+  viewport/manipulators/CameraRig.cpp
+  viewport/manipulators/CameraRig.h
+  viewport/manipulators/ManipulatorVert.cpp
+  viewport/manipulators/ManipulatorFrag.cpp
+  viewport/manipulators/CameraManipulator.cpp
+  viewport/manipulators/CameraManipulator.h
+  viewport/manipulators/Manipulator.cpp
+  viewport/manipulators/Manipulator.h
+  viewport/manipulators/MouseHoverManipulator.cpp
+  viewport/manipulators/MouseHoverManipulator.h
+  viewport/manipulators/PositionManipulator.cpp
+  viewport/manipulators/PositionManipulator.h
+  viewport/manipulators/RotationManipulator.cpp
+  viewport/manipulators/RotationManipulator.h
+  viewport/manipulators/ScaleManipulator.cpp
+  viewport/manipulators/ScaleManipulator.h
+  viewport/manipulators/SelectionManipulator.cpp
+  viewport/manipulators/SelectionManipulator.h
   viewport/Viewport.cpp
   viewport/Viewport.h
   widgets/TextEditor.cpp
