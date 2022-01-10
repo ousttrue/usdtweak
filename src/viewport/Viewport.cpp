@@ -81,10 +81,9 @@ void Viewport::DrawCameraList(UsdStageRefPtr stage) {
 }
 
 Viewport::Viewport()
-    : _cameraManipulator({InitialWindowWidth, InitialWindowHeight}),
-      _currentEditingState(new MouseHoverManipulator()), _activeManipulator(&_positionManipulator),
-      _viewportSize(InitialWindowWidth, InitialWindowHeight), _selectedCameraPath(perspectiveCameraPath),
-      _renderCamera(&_perspectiveCamera) {
+    : _cameraManipulator({InitialWindowWidth, InitialWindowHeight}), _currentEditingState(new MouseHoverManipulator()),
+      _activeManipulator(&_positionManipulator), _viewportSize(InitialWindowWidth, InitialWindowHeight),
+      _selectedCameraPath(perspectiveCameraPath), _renderCamera(&_perspectiveCamera) {
 
     // Viewport draw target
     _cameraManipulator.ResetPosition(GetCurrentCamera());
@@ -158,7 +157,9 @@ Viewport::~Viewport() {
 }
 
 /// Draw the viewport widget
-void Viewport::Draw(UsdStageRefPtr stage, Selection &selection) {
+void Viewport::Draw(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+    Render(stage, selection, w, h);
+
     ImVec2 wsize = ImGui::GetWindowSize();
     ImGui::Button("\xef\x80\xb0 Cameras");
     ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonLeft;
@@ -253,9 +254,6 @@ void Viewport::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
     }
     ImGui::PopStyleColor();
 }
-
-/// Resize the Hydra viewport/render panel
-void Viewport::SetSize(int width, int height) { _viewportSize = GfVec2i(width, height); }
 
 /// Frane the viewport using the bounding box of the selection
 void Viewport::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &selection) { // Camera manipulator ???
@@ -410,7 +408,10 @@ template <typename HasPositionT> inline void CopyCameraPosition(const GfCamera &
     object.SetPosition(lightPos);
 }
 
-void Viewport::Render(UsdStageRefPtr stage, Selection &selection) {
+void Viewport::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+    /// Resize the Hydra viewport/render panel
+    _viewportSize = GfVec2i(w, h);
+
     Update(stage, selection);
 
     GfVec2i renderSize = _drawTarget->GetSize();
@@ -513,8 +514,8 @@ void Viewport::Update(UsdStageRefPtr stage, Selection &selection) {
     }
 }
 
-bool Viewport::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath, SdfPath &outHitInstancerPath,
-                                int &outHitInstanceIndex) {
+bool Viewport::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
+                                SdfPath &outHitInstancerPath, int &outHitInstanceIndex) {
 
     GfVec2i renderSize = _drawTarget->GetSize();
     double width = static_cast<double>(renderSize[0]);
@@ -526,7 +527,7 @@ bool Viewport::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clicke
     GfVec3d outHitNormal;
     return (_renderparams && _renderer &&
             _renderer->TestIntersection(GetCurrentCamera().GetFrustum().ComputeViewMatrix(),
-                                        pixelFrustum.ComputeProjectionMatrix(), stage->GetPseudoRoot(),
-                                        *_renderparams, &outHitPoint, &outHitNormal, &outHitPrimPath, &outHitInstancerPath,
+                                        pixelFrustum.ComputeProjectionMatrix(), stage->GetPseudoRoot(), *_renderparams,
+                                        &outHitPoint, &outHitNormal, &outHitPrimPath, &outHitInstancerPath,
                                         &outHitInstanceIndex));
 }

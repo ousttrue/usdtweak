@@ -145,8 +145,7 @@ void Setup(Dockspace *dockspace, Editor *editor, Viewport *viewport) {
     _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [editor, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
-            viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection());
+            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection(), static_cast<int>(wsize.x), static_cast<int>(wsize.y - ViewportBorderSize));
         }
         ImGui::End();
     }));
@@ -243,7 +242,8 @@ void Setup(Dockspace *dockspace, Editor *editor, Viewport *viewport) {
     auto has_layer = [editor]() { return editor->GetCurrentLayer() != SdfLayerRefPtr(); };
     file->items.push_front(
         {ICON_FA_SAVE " Save layer as", "CTRL+F", [editor]() { DrawModalDialog<SaveLayerAs>(*editor); }, has_layer});
-    file->items.push_front({ICON_FA_SAVE " Save layer", "CTRL+S", [editor]() { editor->GetCurrentLayer()->Save(true); }, has_layer});
+    file->items.push_front(
+        {ICON_FA_SAVE " Save layer", "CTRL+S", [editor]() { editor->GetCurrentLayer()->Save(true); }, has_layer});
     file->items.push_front({});
     file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [editor]() { DrawModalDialog<OpenUsdFileModalDialog>(*editor); }});
     file->items.push_front({ICON_FA_FILE " New", "", [editor]() { DrawModalDialog<CreateUsdFileModalDialog>(*editor); }});
@@ -298,9 +298,6 @@ int main(int argc, const char **argv) {
         int width;
         int height;
         while (window->newFrame(&width, &height)) {
-
-            // render to texture
-            viewport.Render(editor.GetCurrentStage(), editor.GetSelection());
 
             // Render GUI next
             glViewport(0, 0, width, height);

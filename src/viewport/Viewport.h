@@ -22,6 +22,14 @@
 #include <pxr/imaging/glf/simpleLight.h>
 
 class Viewport final {
+    friend class Grid;
+    friend class CameraManipulator;
+    friend class MouseHoverManipulator;
+    friend class PositionManipulator;
+    friend class RotationManipulator;
+    friend class ScaleManipulator;
+    friend class SelectionManipulator;
+
   public:
     Viewport();
     ~Viewport();
@@ -30,27 +38,21 @@ class Viewport final {
     Viewport(const Viewport &) = delete;
     Viewport &operator=(const Viewport &) = delete;
 
-    /// Render hydra
-    void Render(UsdStageRefPtr stage, Selection &selection);
-
-  private:
-    /// Update internal data: selection, current renderer
-    void Update(UsdStageRefPtr stage, Selection &selection);
-
-  public:
-    /// Set the hydra render size
-    void SetSize(int width, int height);
-
     /// Draw the full widget
-    void Draw(UsdStageRefPtr stage, Selection &selection);
+    void Draw(UsdStageRefPtr stage, Selection &selection, int w, int h);
 
-  private:
-    void DrawCameraList(UsdStageRefPtr stage);
-
-  public:
     /// Returns the time code of this viewport
     UsdTimeCode GetCurrentTimeCode() const { return _renderparams ? _renderparams->frame : UsdTimeCode::Default(); }
     void SetCurrentTimeCode(const UsdTimeCode &tc);
+
+  private:
+    /// Render hydra
+    void Render(UsdStageRefPtr stage, Selection &selection, int w, int h);
+
+    /// Update internal data: selection, current renderer
+    void Update(UsdStageRefPtr stage, Selection &selection);
+
+    void DrawCameraList(UsdStageRefPtr stage);
 
     /// Camera framing
     void FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &);
