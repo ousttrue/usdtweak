@@ -2,7 +2,6 @@
 #include <pxr/imaging/glf/contextCaps.h>
 #include <pxr/usd/sdf/fileFormat.h>
 #include "commands/Commands.h"
-#include "resources/ResourcesLoader.h"
 #include <iostream>
 
 Editor::Editor() : _layerHistoryPointer(0) {
@@ -20,10 +19,9 @@ Editor::Editor() : _layerHistoryPointer(0) {
     _viewport = std::make_shared<Viewport>(UsdStageRefPtr());
 
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
-    LoadSettings();
 }
 
-Editor::~Editor() { SaveSettings(); }
+Editor::~Editor() {}
 
 void Editor::SetCurrentStage(UsdStageCache::Id current) { SetCurrentStage(_stageCache.Find(current)); }
 
@@ -83,8 +81,8 @@ void Editor::UseLayer(SdfLayerRefPtr layer) {
             _layers.emplace(layer);
         }
         SetCurrentLayer(layer);
-        _settings._showContentBrowser = true;
-        _settings._showLayerEditor = true;
+        // _settings._showContentBrowser = true;
+        // _settings._showLayerEditor = true;
     }
 }
 
@@ -104,8 +102,8 @@ void Editor::ImportStage(const std::string &path, bool openLoaded) {
     if (newStage) {
         _stageCache.Insert(newStage);
         SetCurrentStage(newStage);
-        _settings._showContentBrowser = true;
-        _settings._showViewport = true;
+        // _settings._showContentBrowser = true;
+        // _settings._showViewport = true;
     }
 }
 
@@ -126,8 +124,8 @@ void Editor::CreateStage(const std::string &path) {
         if (newStage) {
             _stageCache.Insert(newStage);
             SetCurrentStage(newStage);
-            _settings._showContentBrowser = true;
-            _settings._showViewport = true;
+            // _settings._showContentBrowser = true;
+            // _settings._showViewport = true;
         }
     }
 }
@@ -144,7 +142,3 @@ void Editor::SetSelectedPrimSpec(const SdfPath &primPath) {
         _selectedPrimSpec = GetCurrentLayer()->GetPrimAtPath(primPath);
     }
 }
-
-void Editor::LoadSettings() { _settings = ResourcesLoader::GetEditorSettings(); }
-
-void Editor::SaveSettings() const { ResourcesLoader::GetEditorSettings() = _settings; }

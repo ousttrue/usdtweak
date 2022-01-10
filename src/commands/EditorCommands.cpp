@@ -109,7 +109,7 @@ struct EditorInspectLayerLocation : public EditorCommand {
         if (_editor && _layer) {
             _editor->SetCurrentLayer(_layer);
             _editor->SetSelectedPrimSpec(_path);
-            _editor->ShowLayerEditor();
+            // _editor->ShowLayerEditor();
         }
 
         return false;
@@ -128,7 +128,7 @@ struct EditorSetCurrentLayer : public EditorCommand {
     bool DoIt() override {
         if (_editor && _layer) {
             _editor->SetCurrentLayer(_layer);
-            _editor->ShowLayerEditor();
+            // _editor->ShowLayerEditor();
         }
 
         return false;

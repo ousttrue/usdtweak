@@ -2,7 +2,6 @@
 #include "Editor.h"
 #include "commands/Commands.h"
 #include "Constants.h"
-#include "resources/ResourcesLoader.h"
 #include "CommandLineOptions.h"
 #include "window.h"
 //
@@ -143,7 +142,7 @@ struct SaveLayerAs : public ModalDialog {
 void Setup(Dockspace *dockspace, Editor *self) {
     auto &_docks = dockspace->Docks();
 
-    _docks.push_back(Dock("Stage viewport", &self->Settings()._showViewport, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [self](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
             self->GetViewport()->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
@@ -152,7 +151,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Debug window", &self->Settings()._showDebugWindow, [](bool *p_open) {
+    _docks.push_back(Dock("Debug window", &dockspace->Settings()._showDebugWindow, [](bool *p_open) {
         if (ImGui::Begin("Debug window", p_open)) {
             // DrawDebugInfo();
             ImGui::Text("\xee\x81\x99"
@@ -162,7 +161,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage property editor", &self->Settings()._showPropertyEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [self](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
             if (auto stg = self->GetCurrentStage()) {
@@ -173,13 +172,13 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage outliner", &self->Settings()._showOutliner, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [self](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
         DrawStageOutliner(self->GetCurrentStage(), self->GetViewport()->GetSelection());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage timeline", &self->Settings()._showTimeline, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [self](bool *p_open) {
         ImGui::Begin("Timeline", p_open);
         UsdTimeCode tc = self->GetViewport()->GetCurrentTimeCode();
         DrawTimeline(self->GetCurrentStage(), tc);
@@ -187,7 +186,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer navigator", &self->Settings()._showLayerEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer navigator", &dockspace->Settings()._showLayerEditor, [self](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer navigation" +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -197,7 +196,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer hierarchy", &self->Settings()._showLayerHierarchyEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer hierarchy", &dockspace->Settings()._showLayerHierarchyEditor, [self](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer hierarchy " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -207,7 +206,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer stack", &self->Settings()._showLayerStackEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer stack", &dockspace->Settings()._showLayerStackEditor, [self](bool *p_open) {
         const auto &rootLayer = self->GetCurrentLayer();
         const std::string title("Layer stack " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
@@ -217,14 +216,14 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Content browser", &self->Settings()._showContentBrowser, [self](bool *p_open) {
+    _docks.push_back(Dock("Content browser", &dockspace->Settings()._showContentBrowser, [self](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         ImGui::Begin("Content browser", p_open, windowFlags);
         DrawContentBrowser(*self);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer property editor", &self->Settings()._showPrimSpecEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer property editor", &dockspace->Settings()._showPrimSpecEditor, [self](bool *p_open) {
         ImGui::Begin("Layer property editor", p_open);
         if (self->GetSelectedPrimSpec()) {
             DrawPrimSpecEditor(self->GetSelectedPrimSpec());
@@ -234,7 +233,7 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer text editor", &self->Settings()._textEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Layer text editor", &dockspace->Settings()._textEditor, [self](bool *p_open) {
         ImGui::Begin("Layer text editor", p_open);
         DrawTextEditor(self->GetCurrentLayer());
         ImGui::End();
@@ -274,7 +273,6 @@ int main(int argc, const char **argv) {
     { // Scope as the editor should be deleted before imgui and glfw, to release correctly the memory
         // Resource will load the font/textures/settings
         Editor editor;
-        ResourcesLoader resources; // Assuming resources will be destroyed after editor
 
         Setup(&dockspace, &editor);
 

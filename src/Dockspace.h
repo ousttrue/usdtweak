@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorSettings.h"
 #include <functional>
 #include <list>
 #include <string>
@@ -48,6 +49,11 @@ class Dockspace {
     /// Setting _shutdownRequested to true will stop the main loop
     bool _shutdownRequested = false;
 
+    ///
+    /// Editor settings contains the windows states
+    ///
+    EditorSettings _settings;
+
   public:
     Dockspace(GLFWwindow *window);
     ~Dockspace();
@@ -61,6 +67,14 @@ class Dockspace {
         }
         return &*found;
     }
+
+    /// Make the layer editor visible
+    void ShowLayerEditor() { _settings._showLayerEditor = true; }
+    EditorSettings &Settings() { return _settings; }
+
+    /// Interface with the settings
+    void LoadSettings();
+    void SaveSettings() const;
 
   private:
     void DrawMainMenuBar();

@@ -30,8 +30,6 @@ add_executable(
   resources/glsl/GridFrag.cpp
   resources/glsl/ManipulatorVert.cpp
   resources/glsl/ManipulatorFrag.cpp
-  resources/ResourcesLoader.cpp
-  resources/ResourcesLoader.h
   viewport/Selection.cpp
   viewport/Selection.h
   viewport/CameraManipulator.cpp

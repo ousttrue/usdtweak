@@ -4,7 +4,6 @@
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/primSpec.h>
 #include "viewport/Viewport.h"
-#include "EditorSettings.h"
 
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
 class Editor {
@@ -51,21 +50,12 @@ class Editor {
     /// Render the hydra viewport
     void HydraRender();
 
-    /// Make the layer editor visible
-    void ShowLayerEditor() { _settings._showLayerEditor = true; }
-
-    EditorSettings &Settings() { return _settings; }
-
     Viewport *GetViewport() { return _viewport.get(); }
 
   private:
     /// Make sure the layer is correctly in the list of layers,
     /// makes it current and show the appropriate windows
     void UseLayer(SdfLayerRefPtr layer);
-
-    /// Interface with the settings
-    void LoadSettings();
-    void SaveSettings() const;
 
     /// Using a stage cache to store the stages, seems to work well
     UsdStageCache _stageCache;
@@ -74,11 +64,6 @@ class Editor {
     std::set<SdfLayerRefPtr> _layers;
     SdfLayerRefPtrVector _layerHistory;
     size_t _layerHistoryPointer;
-
-    ///
-    /// Editor settings contains the windows states
-    ///
-    EditorSettings _settings;
 
     UsdStageRefPtr _currentStage;
     std::shared_ptr<Viewport> _viewport;
