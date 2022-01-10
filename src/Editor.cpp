@@ -16,8 +16,6 @@ Editor::Editor() : _layerHistoryPointer(0) {
     std::cout << "Hydra enabled : " << UsdImagingGLEngine::IsHydraEnabled() << std::endl;
     // GlfRegisterDefaultDebugOutputMessageCallback();
 
-    _viewport = std::make_shared<Viewport>(UsdStageRefPtr());
-
     ExecuteAfterDraw<EditorSetDataPointer>(this); // This is specialized to execute here, not after the draw
 }
 
@@ -33,7 +31,10 @@ void Editor::SetCurrentStage(UsdStageRefPtr stage) {
         SetCurrentLayer(_currentStage->GetRootLayer());
     }
     // TODO multiple viewport management
-    _viewport->SetCurrentStage(stage);
+    if(OnStageChanged)
+    {
+        OnStageChanged(stage);
+    }
 }
 
 void Editor::SetCurrentLayer(SdfLayerRefPtr layer) {
@@ -128,13 +129,6 @@ void Editor::CreateStage(const std::string &path) {
             // _settings._showViewport = true;
         }
     }
-}
-
-void Editor::HydraRender() {
-#ifndef __APPLE__
-    _viewport->Update();
-    _viewport->Render();
-#endif
 }
 
 void Editor::SetSelectedPrimSpec(const SdfPath &primPath) {

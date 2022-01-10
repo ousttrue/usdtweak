@@ -23,7 +23,7 @@
 
 class Viewport final {
   public:
-    Viewport(UsdStageRefPtr stage);
+    Viewport(UsdStageRefPtr stage = {});
     ~Viewport();
 
     // Delete copy

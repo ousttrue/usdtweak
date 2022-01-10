@@ -139,14 +139,14 @@ struct SaveLayerAs : public ModalDialog {
 };
 
 // setup docks
-void Setup(Dockspace *dockspace, Editor *self) {
+void Setup(Dockspace *dockspace, Editor *self, Viewport *viewport) {
     auto &_docks = dockspace->Docks();
 
-    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [self, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
-            self->GetViewport()->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
-            self->GetViewport()->Draw();
+            viewport->SetSize(wsize.x, wsize.y - ViewportBorderSize); // for the next render
+            viewport->Draw();
         }
         ImGui::End();
     }));
@@ -161,28 +161,28 @@ void Setup(Dockspace *dockspace, Editor *self) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [self, viewport](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
             if (auto stg = self->GetCurrentStage()) {
-                auto prim = stg->GetPrimAtPath(GetSelectedPath(self->GetViewport()->GetSelection()));
-                DrawUsdPrimProperties(prim, self->GetViewport()->GetCurrentTimeCode());
+                auto prim = stg->GetPrimAtPath(GetSelectedPath(viewport->GetSelection()));
+                DrawUsdPrimProperties(prim, viewport->GetCurrentTimeCode());
             }
         }
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [self, viewport](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
-        DrawStageOutliner(self->GetCurrentStage(), self->GetViewport()->GetSelection());
+        DrawStageOutliner(self->GetCurrentStage(), viewport->GetSelection());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [self](bool *p_open) {
+    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [self, viewport](bool *p_open) {
         ImGui::Begin("Timeline", p_open);
-        UsdTimeCode tc = self->GetViewport()->GetCurrentTimeCode();
+        UsdTimeCode tc = viewport->GetCurrentTimeCode();
         DrawTimeline(self->GetCurrentStage(), tc);
-        self->GetViewport()->SetCurrentTimeCode(tc);
+        viewport->SetCurrentTimeCode(tc);
         ImGui::End();
     }));
 
@@ -273,8 +273,13 @@ int main(int argc, const char **argv) {
     { // Scope as the editor should be deleted before imgui and glfw, to release correctly the memory
         // Resource will load the font/textures/settings
         Editor editor;
+        Viewport viewport;
+        editor.OnStageChanged = [&viewport](auto stage)
+        {
+            viewport.SetCurrentStage(stage);
+        };
 
-        Setup(&dockspace, &editor);
+        Setup(&dockspace, &editor, &viewport);
 
         window->setOnDrop([&editor](int count, const char **paths) {
             for (int i = 0; i < count; ++i) {
@@ -299,7 +304,10 @@ int main(int argc, const char **argv) {
         while (window->newFrame(&width, &height)) {
 
             // render to texture
-            editor.HydraRender();
+            viewport.Update();
+            viewport.Render();
+
+            // editor.HydraRender();
 
             // Render GUI next
             glViewport(0, 0, width, height);

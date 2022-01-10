@@ -11,6 +11,7 @@
 #include "DefaultImGuiIni.h"
 
 #define GUI_CONFIG_FILE "usdtweak_gui.ini"
+const auto FONT_SIZE = 20.0f;
 
 #ifdef _WIN64
 #include <sstream>
@@ -160,12 +161,10 @@ Dockspace::Dockspace(GLFWwindow *window) {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    const auto font_size = 24.0f;
-
     // Font
     ImFontConfig fontConfig;
     // auto fontDefault = io.Fonts->AddFontDefault(&fontConfig); // DroidSans
-    auto fontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", font_size, &fontConfig,
+    auto fontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", FONT_SIZE, &fontConfig,
                                                     io.Fonts->GetGlyphRangesJapanese()); // DroidSans
 
     // Icons (in font)
@@ -175,7 +174,7 @@ Dockspace::Dockspace(GLFWwindow *window) {
     iconsConfig.PixelSnapH = true;
 
     auto font = io.Fonts->AddFontFromMemoryCompressedTTF(fontawesomefree5_compressed_data, fontawesomefree5_compressed_size,
-                                                         font_size, &iconsConfig, iconRanges);
+                                                         FONT_SIZE, &iconsConfig, iconRanges);
 
     // Install handlers to read and write the settings
     ImGuiContext *imGuiContext = ImGui::GetCurrentContext();

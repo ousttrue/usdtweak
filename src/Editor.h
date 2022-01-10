@@ -1,9 +1,11 @@
 #pragma once
-#include <set>
 #include <pxr/usd/usd/stageCache.h>
 #include <pxr/usd/sdf/layer.h>
 #include <pxr/usd/sdf/primSpec.h>
 #include "viewport/Viewport.h"
+#include <set>
+
+using StageChangedFunc = std::function<void(UsdStageRefPtr stage)>;
 
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
 class Editor {
@@ -47,10 +49,7 @@ class Editor {
     void ImportStage(const std::string &path, bool openLoaded = true);
     void SaveCurrentLayerAs(const std::string &path);
 
-    /// Render the hydra viewport
-    void HydraRender();
-
-    Viewport *GetViewport() { return _viewport.get(); }
+    StageChangedFunc OnStageChanged;
 
   private:
     /// Make sure the layer is correctly in the list of layers,
@@ -66,7 +65,6 @@ class Editor {
     size_t _layerHistoryPointer;
 
     UsdStageRefPtr _currentStage;
-    std::shared_ptr<Viewport> _viewport;
 
     /// Selected prim spec. This variable might move somewhere else
     SdfPrimSpecHandle _selectedPrimSpec;
