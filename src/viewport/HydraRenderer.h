@@ -39,15 +39,15 @@ class HydraRenderer final {
     HydraRenderer &operator=(const HydraRenderer &) = delete;
 
     /// Draw the full widget
-    void Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h);
+    void Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, GLuint textuireID);
 
     /// Returns the time code of this viewport
     UsdTimeCode GetCurrentTimeCode() const { return _renderparams ? _renderparams->frame : UsdTimeCode::Default(); }
     void SetCurrentTimeCode(const UsdTimeCode &tc);
 
+    GLuint Render(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h);
   private:
     /// Render hydra
-    void Render(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h);
 
     /// Update internal data: selection, current renderer
     void Update(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection);

@@ -164,9 +164,7 @@ HydraRenderer::~HydraRenderer() {
 }
 
 /// Draw the viewport widget
-void HydraRenderer::Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h) {
-    Render(stage, selection, w, h);
-
+void HydraRenderer::Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, GLuint textureId) {
     ImVec2 wsize = ImGui::GetWindowSize();
     ImGui::Button("\xef\x80\xb0 Cameras");
     ImGuiPopupFlags flags = ImGuiPopupFlags_MouseButtonLeft;
@@ -208,22 +206,20 @@ void HydraRenderer::Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection>
     ImGui::SetNextItemWidth(100);
     DrawPickMode(_selectionManipulator);
 
-    if (_textureId) {
-        // Get the size of the child (i.e. the whole draw size of the windows).
-        auto cursorPos = ImGui::GetCursorPos();
-        ImGui::Image((ImTextureID)_textureId, ImVec2(wsize.x, wsize.y - ViewportBorderSize), ImVec2(0, 1), ImVec2(1, 0));
-        // TODO: it is possible to have a popup menu on top of the viewport.
-        // It should be created depending on the manipulator/editor state
-        // if (ImGui::BeginPopupContextItem()) {
-        //    ImGui::Button("ColorCorrection");
-        //    ImGui::Button("Deactivate");
-        //    ImGui::EndPopup();
-        //}
-        HandleManipulationEvents(stage, selection);
-        HandleKeyboardShortcut();
+    // Get the size of the child (i.e. the whole draw size of the windows).
+    auto cursorPos = ImGui::GetCursorPos();
+    ImGui::Image((ImTextureID)textureId, ImVec2(wsize.x, wsize.y - ViewportBorderSize), ImVec2(0, 1), ImVec2(1, 0));
+    // TODO: it is possible to have a popup menu on top of the viewport.
+    // It should be created depending on the manipulator/editor state
+    // if (ImGui::BeginPopupContextItem()) {
+    //    ImGui::Button("ColorCorrection");
+    //    ImGui::Button("Deactivate");
+    //    ImGui::EndPopup();
+    //}
+    HandleManipulationEvents(stage, selection);
+    HandleKeyboardShortcut();
 
-        DrawManipulatorToolbox(cursorPos);
-    }
+    DrawManipulatorToolbox(cursorPos);
 }
 
 // Poor man manipulator toolbox
@@ -418,7 +414,7 @@ template <typename HasPositionT> inline void CopyCameraPosition(const GfCamera &
     object.SetPosition(lightPos);
 }
 
-void HydraRenderer::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+GLuint HydraRenderer::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) {
     /// Resize the Hydra viewport/render panel
     _viewportSize = GfVec2i(w, h);
 
@@ -429,7 +425,7 @@ void HydraRenderer::Render(UsdStageRefPtr stage, Selection &selection, int w, in
     int height = renderSize[1];
 
     if (width == 0 || height == 0)
-        return;
+        return 0;
 
     _drawTarget->Bind();
     glEnable(GL_DEPTH_TEST);
@@ -464,6 +460,8 @@ void HydraRenderer::Render(UsdStageRefPtr stage, Selection &selection, int w, in
     GetActiveManipulator().OnDrawFrame(stage, *this);
 
     _drawTarget->Unbind();
+
+    return _textureId;
 }
 
 void HydraRenderer::SetCurrentTimeCode(const UsdTimeCode &tc) {
@@ -487,7 +485,7 @@ void HydraRenderer::Update(UsdStageRefPtr stage, Selection &selection) {
             _grid.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
 
             // TODO:
-            // InitializeRendererAov(*_renderer);            
+            // InitializeRendererAov(*_renderer);
         } else if (whichRenderer->second != _renderer) {
             _renderer = whichRenderer->second;
             _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");

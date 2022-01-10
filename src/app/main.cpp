@@ -150,8 +150,11 @@ void Setup(Dockspace *dockspace, StageLoader *loader, HydraRenderer *viewport) {
     _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [loader, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
-            viewport->Draw(loader->GetCurrentStage(), loader->GetSelection(), static_cast<int>(wsize.x),
-                           static_cast<int>(wsize.y - ViewportBorderSize));
+            auto textuireId = viewport->Render(loader->GetCurrentStage(), loader->GetSelection(), static_cast<int>(wsize.x),
+                                               static_cast<int>(wsize.y - ViewportBorderSize));
+            if (textuireId) {
+                viewport->Draw(loader->GetCurrentStage(), loader->GetSelection(), textuireId);
+            }
         }
         ImGui::End();
     }));
