@@ -5,7 +5,7 @@
 #include <Selection.h>
 #include "RotationManipulator.h"
 #include "GeometricFunctions.h"
-#include "Viewport.h"
+#include "HydraRenderer.h"
 #include <imgui.h>
 #include <commands/Commands.h>
 #include "GlslCode.h"

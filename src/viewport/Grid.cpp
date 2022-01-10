@@ -13,7 +13,7 @@
 #include <pxr/imaging/garch/glApi.h>
 #include <pxr/base/gf/matrix4f.h>
 #include <pxr/base/gf/line.h>
-#include "Viewport.h"
+#include "HydraRenderer.h"
 #include "manipulators/GlslCode.h"
 
 // In the viewing volume, the xy plane clipped at 1, this covers the full view area

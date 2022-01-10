@@ -23,7 +23,8 @@ add_library(
   manipulators/ScaleManipulator.h
   manipulators/SelectionManipulator.cpp
   manipulators/SelectionManipulator.h
-  Viewport.cpp
-  Viewport.h)
+  HydraRenderer.cpp
+  HydraRenderer.h)
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${TARGET_NAME} PRIVATE usdtweak_stage imgui iconfontcppheaders)
+target_link_libraries(${TARGET_NAME} PRIVATE usdtweak_stage imgui
+                                             iconfontcppheaders)

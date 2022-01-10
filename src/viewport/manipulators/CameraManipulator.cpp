@@ -1,5 +1,5 @@
 #include "CameraManipulator.h"
-#include "Viewport.h"
+#include "HydraRenderer.h"
 #include <pxr/usd/usdGeom/camera.h>
 #include <commands/Commands.h>
 #include <imgui.h>

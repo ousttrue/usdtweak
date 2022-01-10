@@ -2,7 +2,7 @@
 #include <pxr/usd/kind/registry.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/prim.h>
-#include "Viewport.h"
+#include "HydraRenderer.h"
 #include <Selection.h>
 #include <SensEvts.h>
 #include <imgui.h>

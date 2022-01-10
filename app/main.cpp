@@ -1,10 +1,10 @@
 #include "Dockspace.h"
-#include "stage/StageLoader.h"
-#include "stage/commands/Commands.h"
-#include "viewport/Viewport.h"
-#include <Constants.h>
 #include "CommandLineOptions.h"
 #include "window.h"
+#include <StageLoader.h>
+#include <commands/Commands.h>
+#include <HydraRenderer.h>
+#include <Constants.h>
 //
 #include "widgets/PropertyEditor.h"
 #include "widgets/StageOutliner.h"
@@ -143,13 +143,13 @@ struct SaveLayerAs : public ModalDialog {
 constexpr float ViewportBorderSize = 60.f;
 
 // setup docks
-void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
+void Setup(Dockspace *dockspace, StageLoader *loader, HydraRenderer *viewport) {
     auto &_docks = dockspace->Docks();
 
-    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [editor, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [loader, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
-            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection(), static_cast<int>(wsize.x),
+            viewport->Draw(loader->GetCurrentStage(), loader->GetSelection(), static_cast<int>(wsize.x),
                            static_cast<int>(wsize.y - ViewportBorderSize));
         }
         ImGui::End();
@@ -165,53 +165,53 @@ void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [editor, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage property editor", &dockspace->Settings()._showPropertyEditor, [loader, viewport](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin("Stage property editor", p_open, windowFlags)) {
-            if (auto stg = editor->GetCurrentStage()) {
-                auto prim = stg->GetPrimAtPath(GetSelectedPath(editor->GetSelection()));
+            if (auto stg = loader->GetCurrentStage()) {
+                auto prim = stg->GetPrimAtPath(GetSelectedPath(loader->GetSelection()));
                 DrawUsdPrimProperties(prim, viewport->GetCurrentTimeCode());
             }
         }
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [editor, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage outliner", &dockspace->Settings()._showOutliner, [loader, viewport](bool *p_open) {
         ImGui::Begin("Stage outliner", p_open);
-        DrawStageOutliner(editor->GetCurrentStage(), editor->GetSelection());
+        DrawStageOutliner(loader->GetCurrentStage(), loader->GetSelection());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [editor, viewport](bool *p_open) {
+    _docks.push_back(Dock("Stage timeline", &dockspace->Settings()._showTimeline, [loader, viewport](bool *p_open) {
         ImGui::Begin("Timeline", p_open);
         UsdTimeCode tc = viewport->GetCurrentTimeCode();
-        DrawTimeline(editor->GetCurrentStage(), tc);
+        DrawTimeline(loader->GetCurrentStage(), tc);
         viewport->SetCurrentTimeCode(tc);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer navigator", &dockspace->Settings()._showLayerEditor, [editor](bool *p_open) {
-        const auto &rootLayer = editor->GetCurrentLayer();
+    _docks.push_back(Dock("Layer navigator", &dockspace->Settings()._showLayerEditor, [loader](bool *p_open) {
+        const auto &rootLayer = loader->GetCurrentLayer();
         const std::string title("Layer navigation" +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer navigation");
         ImGui::Begin(title.c_str(), p_open);
-        DrawLayerNavigation(rootLayer, editor->GetSelectedPrimSpec());
+        DrawLayerNavigation(rootLayer, loader->GetSelectedPrimSpec());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer hierarchy", &dockspace->Settings()._showLayerHierarchyEditor, [editor](bool *p_open) {
-        const auto &rootLayer = editor->GetCurrentLayer();
+    _docks.push_back(Dock("Layer hierarchy", &dockspace->Settings()._showLayerHierarchyEditor, [loader](bool *p_open) {
+        const auto &rootLayer = loader->GetCurrentLayer();
         const std::string title("Layer hierarchy " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer hierarchy");
         ImGui::Begin(title.c_str(), p_open);
-        DrawLayerPrimHierarchy(rootLayer, editor->GetSelectedPrimSpec());
+        DrawLayerPrimHierarchy(rootLayer, loader->GetSelectedPrimSpec());
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer stack", &dockspace->Settings()._showLayerStackEditor, [editor](bool *p_open) {
-        const auto &rootLayer = editor->GetCurrentLayer();
+    _docks.push_back(Dock("Layer stack", &dockspace->Settings()._showLayerStackEditor, [loader](bool *p_open) {
+        const auto &rootLayer = loader->GetCurrentLayer();
         const std::string title("Layer stack " +
                                 (rootLayer ? (" - " + rootLayer->GetDisplayName() + (rootLayer->IsDirty() ? " *" : " ")) : "") +
                                 "###Layer stack");
@@ -220,38 +220,38 @@ void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Content browser", &dockspace->Settings()._showContentBrowser, [editor](bool *p_open) {
+    _docks.push_back(Dock("Content browser", &dockspace->Settings()._showContentBrowser, [loader](bool *p_open) {
         ImGuiWindowFlags windowFlags = 0 | ImGuiWindowFlags_MenuBar;
         ImGui::Begin("Content browser", p_open, windowFlags);
-        DrawContentBrowser(*editor);
+        DrawContentBrowser(*loader);
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer property editor", &dockspace->Settings()._showPrimSpecEditor, [editor](bool *p_open) {
+    _docks.push_back(Dock("Layer property editor", &dockspace->Settings()._showPrimSpecEditor, [loader](bool *p_open) {
         ImGui::Begin("Layer property editor", p_open);
-        if (editor->GetSelectedPrimSpec()) {
-            DrawPrimSpecEditor(editor->GetSelectedPrimSpec());
+        if (loader->GetSelectedPrimSpec()) {
+            DrawPrimSpecEditor(loader->GetSelectedPrimSpec());
         } else {
-            DrawLayerHeader(editor->GetCurrentLayer());
+            DrawLayerHeader(loader->GetCurrentLayer());
         }
         ImGui::End();
     }));
 
-    _docks.push_back(Dock("Layer text editor", &dockspace->Settings()._textEditor, [editor](bool *p_open) {
+    _docks.push_back(Dock("Layer text editor", &dockspace->Settings()._textEditor, [loader](bool *p_open) {
         ImGui::Begin("Layer text editor", p_open);
-        DrawTextEditor(editor->GetCurrentLayer());
+        DrawTextEditor(loader->GetCurrentLayer());
         ImGui::End();
     }));
 
     auto file = dockspace->GetMenu("File");
-    auto has_layer = [editor]() { return editor->GetCurrentLayer() != SdfLayerRefPtr(); };
+    auto has_layer = [loader]() { return loader->GetCurrentLayer() != SdfLayerRefPtr(); };
     file->items.push_front(
-        {ICON_FA_SAVE " Save layer as", "CTRL+F", [editor]() { DrawModalDialog<SaveLayerAs>(*editor); }, has_layer});
+        {ICON_FA_SAVE " Save layer as", "CTRL+F", [loader]() { DrawModalDialog<SaveLayerAs>(*loader); }, has_layer});
     file->items.push_front(
-        {ICON_FA_SAVE " Save layer", "CTRL+S", [editor]() { editor->GetCurrentLayer()->Save(true); }, has_layer});
+        {ICON_FA_SAVE " Save layer", "CTRL+S", [loader]() { loader->GetCurrentLayer()->Save(true); }, has_layer});
     file->items.push_front({});
-    file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [editor]() { DrawModalDialog<OpenUsdFileModalDialog>(*editor); }});
-    file->items.push_front({ICON_FA_FILE " New", "", [editor]() { DrawModalDialog<CreateUsdFileModalDialog>(*editor); }});
+    file->items.push_front({ICON_FA_FOLDER_OPEN " Open", "", [loader]() { DrawModalDialog<OpenUsdFileModalDialog>(*loader); }});
+    file->items.push_front({ICON_FA_FILE " New", "", [loader]() { DrawModalDialog<CreateUsdFileModalDialog>(*loader); }});
 
     auto edit = dockspace->GetMenu("Edit");
     edit->items.push_front({"Redo", "CTRL+R", []() { ExecuteAfterDraw<RedoCommand>(); }});
@@ -277,26 +277,26 @@ int main(int argc, const char **argv) {
 
     { // Scope as the editor should be deleted before imgui and glfw, to release correctly the memory
         // Resource will load the font/textures/settings
-        StageLoader editor;
-        HydraRenderer viewport;
+        StageLoader loader;
+        HydraRenderer hydra;
 
-        Setup(&dockspace, &editor, &viewport);
+        Setup(&dockspace, &loader, &hydra);
 
-        window->setOnDrop([&editor](int count, const char **paths) {
+        window->setOnDrop([&loader](int count, const char **paths) {
             for (int i = 0; i < count; ++i) {
                 // make a drop event ?
                 if (ArchGetFileLength(paths[i]) == 0) {
                     // if the file is empty, this is considered a new file
-                    editor.CreateStage(std::string(paths[i]));
+                    loader.CreateStage(std::string(paths[i]));
                 } else {
-                    editor.ImportLayer(std::string(paths[i]));
+                    loader.ImportLayer(std::string(paths[i]));
                 }
             }
         });
 
         // Process command line options
         for (auto &stage : options.stages()) {
-            editor.ImportStage(stage);
+            loader.ImportStage(stage);
         }
 
         // Loop until the user closes the window
