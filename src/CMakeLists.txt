@@ -3,8 +3,6 @@ subdirs(3rdparty)
 add_library(
   usdtweak_lib
   Constants.h
-  CommandLineOptions.h
-  CommandLineOptions.cpp
   Editor.cpp
   Editor.h
   GeometricFunctions.h
