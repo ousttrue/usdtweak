@@ -18,18 +18,18 @@ class PositionManipulator : public Manipulator {
 
     /// From ViewportEditor
     /// Note: a Manipulator does not store a viewport as it can be rendered in multiple viewport at the same time
-    void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
-    void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
+    void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
 
     /// Return true if the mouse is over this manipulator for the viewport passed in argument
-    bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
+    bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
     /// Draw the translate manipulator as seen in the viewport
-    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
+    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
     /// Called when the viewport changes its selection
-    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
+    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
 
     typedef enum { // use class enum ??
         XAxis = 0,
@@ -41,10 +41,10 @@ class PositionManipulator : public Manipulator {
   private:
     bool CompileShaders();
 
-    void ProjectMouseOnAxis(const Viewport &viewport, GfVec3d &closestPoint);
-    GfMatrix4d ComputeManipulatorToWorldTransform(const Viewport &viewport);
+    void ProjectMouseOnAxis(const HydraRenderer &viewport, GfVec3d &closestPoint);
+    GfMatrix4d ComputeManipulatorToWorldTransform(const HydraRenderer &viewport);
 
-    UsdTimeCode GetEditionTimeCode(const Viewport &viewport);
+    UsdTimeCode GetEditionTimeCode(const HydraRenderer &viewport);
 
     SelectedAxis _selectedAxis;
 

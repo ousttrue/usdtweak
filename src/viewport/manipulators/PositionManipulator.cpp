@@ -6,7 +6,7 @@
 #include "GeometricFunctions.h"
 #include "viewport/Viewport.h"
 #include <imgui.h>
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "GlslCode.h"
 
 /*
@@ -116,7 +116,7 @@ bool PositionManipulator::CompileShaders() {
     return true;
 }
 
-bool PositionManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
+bool PositionManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &viewport) {
 
     if (_xformAPI) {
         const auto &frustum = viewport.GetCurrentCamera().GetFrustum();
@@ -161,12 +161,12 @@ bool PositionManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Vi
 }
 
 // Same as rotation manipulator now -- TODO : share in a common class
-void PositionManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+void PositionManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
 
-GfMatrix4d PositionManipulator::ComputeManipulatorToWorldTransform(const Viewport &viewport) {
+GfMatrix4d PositionManipulator::ComputeManipulatorToWorldTransform(const HydraRenderer &viewport) {
     if (_xformAPI) {
         const auto currentTime = viewport.GetCurrentTimeCode();
         GfVec3d translation;
@@ -188,7 +188,7 @@ GfMatrix4d PositionManipulator::ComputeManipulatorToWorldTransform(const Viewpor
 }
 
 // TODO: same as rotation manipulator, share in a base class
-void PositionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
+void PositionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &viewport) {
 
     if (_xformAPI) {
         const auto &camera = viewport.GetCurrentCamera();
@@ -232,7 +232,7 @@ void PositionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Vi
     }
 }
 
-void PositionManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+void PositionManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &viewport) {
     // Save original translation values
     GfVec3f scale;
     GfVec3f pivot;
@@ -248,7 +248,7 @@ void PositionManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewp
     BeginEdition(stage);
 }
 
-Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
 
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
@@ -273,10 +273,10 @@ Manipulator *PositionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Sel
     return this;
 };
 
-void PositionManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) { EndEdition(); };
+void PositionManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) { EndEdition(); };
 
 ///
-void PositionManipulator::ProjectMouseOnAxis(const Viewport &viewport, GfVec3d &linePoint) {
+void PositionManipulator::ProjectMouseOnAxis(const HydraRenderer &viewport, GfVec3d &linePoint) {
     if (_xformAPI && _selectedAxis < 3) {
         GfVec3d rayPoint;
         double a = 0;
@@ -287,7 +287,7 @@ void PositionManipulator::ProjectMouseOnAxis(const Viewport &viewport, GfVec3d &
     }
 }
 
-UsdTimeCode PositionManipulator::GetEditionTimeCode(const Viewport &viewport) {
+UsdTimeCode PositionManipulator::GetEditionTimeCode(const HydraRenderer &viewport) {
     std::vector<double> timeSamples; // TODO: is there a faster way to know it the xformable has timesamples ?
     const auto xformable = UsdGeomXformable(_xformAPI.GetPrim());
     xformable.GetTimeSamples(&timeSamples);

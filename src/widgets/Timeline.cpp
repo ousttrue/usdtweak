@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Timeline.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "Gui.h"
 
 // The easiest version of a timeline: a slider

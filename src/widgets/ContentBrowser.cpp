@@ -7,7 +7,7 @@
 #include "ImGuiHelpers.h"
 #include "ContentBrowser.h"
 #include "LayerEditor.h" // for DrawLayerMenuItems
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "Constants.h"
 #include "TextFilter.h"
 
@@ -144,7 +144,7 @@ void DrawLayerSet(UsdStageCache &cache, SdfLayerSetT &layerSet, SdfLayerHandle *
     }
 }
 
-void DrawContentBrowser(Editor &editor) {
+void DrawContentBrowser(StageLoader &editor) {
     static ContentBrowserOptions options;
     if (ImGui::BeginMenuBar()) {
         bool selected = true;

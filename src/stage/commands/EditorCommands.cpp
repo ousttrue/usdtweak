@@ -8,27 +8,27 @@
 ///
 
 #include <string>
-#include "commands/Commands.h"
-#include "Editor.h"
+#include "Commands.h"
+#include "stage/StageLoader.h"
 
 ///
 /// Base class for an editor command, contai ns only a pointer of the editor
 ///
 struct EditorCommand : public Command {
-    static Editor *_editor;
+    static StageLoader *_editor;
 };
-Editor *EditorCommand::_editor = nullptr;
+StageLoader *EditorCommand::_editor = nullptr;
 
 /// The editor commands need a pointer to the data
 /// Other client can use this function to pass a handle to their data structure
 struct EditorSetDataPointer : public EditorCommand {
-    EditorSetDataPointer(Editor *editor) {
+    EditorSetDataPointer(StageLoader *editor) {
         if (!_editor)
             _editor = editor;
     }
     bool DoIt() override { return false; }
 };
-template void ExecuteAfterDraw<EditorSetDataPointer>(Editor *editor);
+template void ExecuteAfterDraw<EditorSetDataPointer>(StageLoader *editor);
 
 
 struct EditorSelectPrimPath : public EditorCommand {

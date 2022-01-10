@@ -8,9 +8,9 @@ class SelectionManipulator : public Manipulator {
     SelectionManipulator() = default;
     ~SelectionManipulator() = default;
 
-    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
+    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
 
     // Picking modes
     enum class PickMode { Prim, Model, Assembly };

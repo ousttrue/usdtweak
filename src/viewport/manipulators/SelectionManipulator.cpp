@@ -33,7 +33,7 @@ bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &
     return false;
 }
 
-Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     auto mousePosition = viewport.GetMousePosition();
     SdfPath outHitPrimPath;
     SdfPath outHitInstancerPath;
@@ -58,7 +58,7 @@ Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Se
     return viewport.GetManipulator<MouseHoverManipulator>();
 }
 
-void SelectionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) {
+void SelectionManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) {
     // Draw a rectangle for the selection
 }
 

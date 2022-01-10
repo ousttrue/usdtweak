@@ -9,7 +9,9 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/Debug/bin/usdtweak.exe",
-            "args": [],
+            "args": [
+                "${workspaceFolder}/../../test_sphere.usda"
+            ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [

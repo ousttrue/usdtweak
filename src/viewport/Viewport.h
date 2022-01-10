@@ -21,7 +21,7 @@
 #include <pxr/usdImaging/usdImagingGL/renderParams.h>
 #include <pxr/imaging/glf/simpleLight.h>
 
-class Viewport final {
+class HydraRenderer final {
     friend class Grid;
     friend class CameraManipulator;
     friend class MouseHoverManipulator;
@@ -31,12 +31,12 @@ class Viewport final {
     friend class SelectionManipulator;
 
   public:
-    Viewport();
-    ~Viewport();
+    HydraRenderer();
+    ~HydraRenderer();
 
     // Delete copy
-    Viewport(const Viewport &) = delete;
-    Viewport &operator=(const Viewport &) = delete;
+    HydraRenderer(const HydraRenderer &) = delete;
+    HydraRenderer &operator=(const HydraRenderer &) = delete;
 
     /// Draw the full widget
     void Draw(UsdStageRefPtr stage, Selection &selection, int w, int h);
@@ -145,9 +145,9 @@ class Viewport final {
     GlfDrawTargetRefPtr _drawTarget;
 };
 
-template <> inline Manipulator *Viewport::GetManipulator<PositionManipulator>() { return &_positionManipulator; }
-template <> inline Manipulator *Viewport::GetManipulator<RotationManipulator>() { return &_rotationManipulator; }
-template <> inline Manipulator *Viewport::GetManipulator<MouseHoverManipulator>() { return &_mouseHover; }
-template <> inline Manipulator *Viewport::GetManipulator<CameraManipulator>() { return &_cameraManipulator; }
-template <> inline Manipulator *Viewport::GetManipulator<SelectionManipulator>() { return &_selectionManipulator; }
-template <> inline Manipulator *Viewport::GetManipulator<ScaleManipulator>() { return &_scaleManipulator; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<PositionManipulator>() { return &_positionManipulator; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<RotationManipulator>() { return &_rotationManipulator; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<MouseHoverManipulator>() { return &_mouseHover; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<CameraManipulator>() { return &_cameraManipulator; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<SelectionManipulator>() { return &_selectionManipulator; }
+template <> inline Manipulator *HydraRenderer::GetManipulator<ScaleManipulator>() { return &_scaleManipulator; }

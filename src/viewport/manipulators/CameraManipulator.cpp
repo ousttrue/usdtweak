@@ -1,25 +1,25 @@
 #include "CameraManipulator.h"
 #include "viewport/Viewport.h"
 #include <pxr/usd/usdGeom/camera.h>
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include <imgui.h>
 
 CameraManipulator::CameraManipulator(const GfVec2i &viewportSize, bool isZUp) : CameraRig(viewportSize, isZUp) {}
 
-void CameraManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+void CameraManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &viewport) {
     _stageCamera = viewport.GetUsdGeomCamera(stage);
     if (_stageCamera) {
         BeginEdition(stage);
     }
 }
 
-void CameraManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+void CameraManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &viewport) {
     if (_stageCamera) {
         EndEdition();
     }
 }
 
-Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     auto &cameraManipulator = viewport.GetCameraManipulator();
     ImGuiIO &io = ImGui::GetIO();
 

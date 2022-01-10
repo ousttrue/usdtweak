@@ -10,7 +10,6 @@
 
 #include "Gui.h"
 #include "Viewport.h"
-#include "commands/Commands.h"
 #include "Constants.h"
 #include "viewport/Selection.h"
 #include "widgets/RendererSettings.h"
@@ -49,7 +48,7 @@ void DrawGLLights(GlfSimpleLightVector &lights) {
 static SdfPath perspectiveCameraPath("/usdtweak/cameras/cameraPerspective");
 
 /// Draw a camera selection
-void Viewport::DrawCameraList(UsdStageRefPtr stage) {
+void HydraRenderer::DrawCameraList(UsdStageRefPtr stage) {
     // TODO: the viewport cameras and the stage camera should live in different lists
     constexpr char const *perspectiveCameraName = "Perspective";
     if (ImGui::BeginListBox("##CameraList")) {
@@ -80,7 +79,7 @@ void Viewport::DrawCameraList(UsdStageRefPtr stage) {
     }
 }
 
-Viewport::Viewport()
+HydraRenderer::HydraRenderer()
     : _cameraManipulator({InitialWindowWidth, InitialWindowHeight}), _currentEditingState(new MouseHoverManipulator()),
       _activeManipulator(&_positionManipulator), _viewportSize(InitialWindowWidth, InitialWindowHeight),
       _selectedCameraPath(perspectiveCameraPath), _renderCamera(&_perspectiveCamera) {
@@ -130,7 +129,7 @@ Viewport::Viewport()
     _ambient = {0.0, 0.0, 0.0, 0.0};
 }
 
-Viewport::~Viewport() {
+HydraRenderer::~HydraRenderer() {
     if (_renderer) {
         _renderer = nullptr; // will be deleted in the map
     }
@@ -157,7 +156,7 @@ Viewport::~Viewport() {
 }
 
 /// Draw the viewport widget
-void Viewport::Draw(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+void HydraRenderer::Draw(UsdStageRefPtr stage, Selection &selection, int w, int h) {
     Render(stage, selection, w, h);
 
     ImVec2 wsize = ImGui::GetWindowSize();
@@ -220,7 +219,7 @@ void Viewport::Draw(UsdStageRefPtr stage, Selection &selection, int w, int h) {
 }
 
 // Poor man manipulator toolbox
-void Viewport::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
+void HydraRenderer::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
     const ImVec2 buttonSize(25, 25); // Button size
     const ImVec2 toolBoxPos(15, 15); // Alignment
     const ImVec4 defaultColor(0.1, 0.1, 0.1, 0.9);
@@ -256,7 +255,7 @@ void Viewport::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
 }
 
 /// Frane the viewport using the bounding box of the selection
-void Viewport::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &selection) { // Camera manipulator ???
+void HydraRenderer::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &selection) { // Camera manipulator ???
     if (stage && !IsSelectionEmpty(selection)) {
         UsdGeomBBoxCache bboxcache(_renderparams->frame, UsdGeomImageable::GetOrderedPurposeTokens());
         GfBBox3d bbox;
@@ -269,7 +268,7 @@ void Viewport::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection 
 }
 
 /// Frame the viewport using the bounding box of the root prim
-void Viewport::FrameRootPrim(UsdStageRefPtr stage) {
+void HydraRenderer::FrameRootPrim(UsdStageRefPtr stage) {
     if (stage) {
         UsdGeomBBoxCache bboxcache(_renderparams->frame, UsdGeomImageable::GetOrderedPurposeTokens());
         auto defaultPrim = stage->GetDefaultPrim();
@@ -282,7 +281,7 @@ void Viewport::FrameRootPrim(UsdStageRefPtr stage) {
     }
 }
 
-GfVec2d Viewport::GetPickingBoundarySize() const {
+GfVec2d HydraRenderer::GetPickingBoundarySize() const {
     const GfVec2i renderSize = _drawTarget->GetSize();
     const double width = static_cast<double>(renderSize[0]);
     const double height = static_cast<double>(renderSize[1]);
@@ -290,7 +289,7 @@ GfVec2d Viewport::GetPickingBoundarySize() const {
 }
 
 //
-double Viewport::ComputeScaleFactor(const GfVec3d &objectPos, const double multiplier) const {
+double HydraRenderer::ComputeScaleFactor(const GfVec3d &objectPos, const double multiplier) const {
     double scale = 1.0;
     const auto &frustum = GetCurrentCamera().GetFrustum();
     auto ray = frustum.ComputeRay(GfVec2d(0, 0)); // camera axis
@@ -302,7 +301,7 @@ double Viewport::ComputeScaleFactor(const GfVec3d &objectPos, const double multi
     return scale;
 }
 
-void Viewport::HandleKeyboardShortcut() {
+void HydraRenderer::HandleKeyboardShortcut() {
     if (ImGui::IsItemHovered()) {
         ImGuiIO &io = ImGui::GetIO();
         static bool SelectionManipulatorPressedOnce = true;
@@ -347,7 +346,7 @@ void Viewport::HandleKeyboardShortcut() {
     }
 }
 
-void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection) {
+void HydraRenderer::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection) {
 
     ImGuiContext *g = ImGui::GetCurrentContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -385,11 +384,11 @@ void Viewport::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Select
     }
 }
 
-GfCamera &Viewport::GetCurrentCamera() { return *_renderCamera; }
-const GfCamera &Viewport::GetCurrentCamera() const { return *_renderCamera; }
-UsdGeomCamera Viewport::GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage) { return UsdGeomCamera::Get(stage, GetCameraPath()); }
+GfCamera &HydraRenderer::GetCurrentCamera() { return *_renderCamera; }
+const GfCamera &HydraRenderer::GetCurrentCamera() const { return *_renderCamera; }
+UsdGeomCamera HydraRenderer::GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage) { return UsdGeomCamera::Get(stage, GetCameraPath()); }
 
-void Viewport::SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath) {
+void HydraRenderer::SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath) {
     _selectedCameraPath = cameraPath;
 
     _renderCamera = &_perspectiveCamera; // by default
@@ -408,7 +407,7 @@ template <typename HasPositionT> inline void CopyCameraPosition(const GfCamera &
     object.SetPosition(lightPos);
 }
 
-void Viewport::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+void HydraRenderer::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) {
     /// Resize the Hydra viewport/render panel
     _viewportSize = GfVec2i(w, h);
 
@@ -456,14 +455,14 @@ void Viewport::Render(UsdStageRefPtr stage, Selection &selection, int w, int h) 
     _drawTarget->Unbind();
 }
 
-void Viewport::SetCurrentTimeCode(const UsdTimeCode &tc) {
+void HydraRenderer::SetCurrentTimeCode(const UsdTimeCode &tc) {
     if (_renderparams) {
         _renderparams->frame = tc;
     }
 }
 
 /// Update anything that could have change after a frame render
-void Viewport::Update(UsdStageRefPtr stage, Selection &selection) {
+void HydraRenderer::Update(UsdStageRefPtr stage, Selection &selection) {
     if (stage) {
         auto whichRenderer = _renderers.find(stage); /// We expect a very limited number of opened stages
         if (whichRenderer == _renderers.end()) {
@@ -514,7 +513,7 @@ void Viewport::Update(UsdStageRefPtr stage, Selection &selection) {
     }
 }
 
-bool Viewport::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
+bool HydraRenderer::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
                                 SdfPath &outHitInstancerPath, int &outHitInstanceIndex) {
 
     GfVec2i renderSize = _drawTarget->GetSize();

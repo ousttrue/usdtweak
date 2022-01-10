@@ -2,7 +2,7 @@
 #include "viewport/Selection.h"
 #include <pxr/usd/usd/common.h>
 
-class Viewport;
+class HydraRenderer;
 
 /// Base class for a manipulator.
 /// The manipulator can be seen as an editing state part of a FSM
@@ -14,15 +14,15 @@ class Viewport;
 
 struct Manipulator {
     virtual ~Manipulator(){};
-    virtual void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &){};     // Enter State
-    virtual void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &){};       // Exit State
-    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) = 0; // Next State
+    virtual void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){};     // Enter State
+    virtual void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){};       // Exit State
+    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) = 0; // Next State
 
-    virtual bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &) { return false; };
+    virtual bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) { return false; };
 
     /// Draw the translate manipulator as seen in the viewport
-    virtual void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &){};
+    virtual void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &){};
 
     /// Called when the viewport changes its selection
-    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &){};
+    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &){};
 };

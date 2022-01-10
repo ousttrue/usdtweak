@@ -1,11 +1,11 @@
 #pragma once
 
-class Viewport;
+class HydraRenderer;
 
 class Grid {
   public:
     Grid();
-    void Render(Viewport &);
+    void Render(HydraRenderer &);
 
     /// Set if the up vector is Z, this will decide which plane to render (xy) or (xz)
     void SetZIsUp(bool);

@@ -1,5 +1,5 @@
 #pragma once
-#include "commands/Commands.h"
+#include "Commands.h"
 #include <imgui.h>
 
 // Boiler plate code for adding a shortcut, mainly to avoid writing the same code multiple time

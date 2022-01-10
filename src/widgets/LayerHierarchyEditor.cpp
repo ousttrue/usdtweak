@@ -17,8 +17,8 @@
 #include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/usdGeom/camera.h>
 
-#include "Editor.h"
-#include "commands/Commands.h"
+#include "stage/StageLoader.h"
+#include "stage/commands/Commands.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "LayerEditor.h"
@@ -26,7 +26,7 @@
 #include "CompositionEditor.h"
 #include "ImGuiHelpers.h"
 #include "Constants.h"
-#include "commands/Shortcuts.h"
+#include "stage/commands/Shortcuts.h"
 
 struct AddVariantModalDialog : public ModalDialog {
 

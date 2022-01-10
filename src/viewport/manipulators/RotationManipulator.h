@@ -16,18 +16,18 @@ class RotationManipulator : public Manipulator {
     ~RotationManipulator();
 
     /// From ViewportEditor
-    void OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
-    void OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) override;
+    void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
+    void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
 
     /// Return true if the mouse is over this manipulator in the viewport passed in argument
-    bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
+    bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
     /// Draw the translate manipulator as seen in the viewport
-    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &) override;
+    void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
     /// Called when the viewport changes its selection
-    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &) override;
+    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
 
     typedef enum { // use class enum ??
         XAxis = 0,
@@ -37,13 +37,13 @@ class RotationManipulator : public Manipulator {
     } SelectedAxis;
 
   private:
-    UsdTimeCode GetEditionTimeCode(const Viewport &);
-    UsdTimeCode GetViewportTimeCode(const Viewport &);
+    UsdTimeCode GetEditionTimeCode(const HydraRenderer &);
+    UsdTimeCode GetViewportTimeCode(const HydraRenderer &);
 
     bool CompileShaders();
-    GfVec3d ComputeClockHandVector(Viewport &viewport);
+    GfVec3d ComputeClockHandVector(HydraRenderer &viewport);
 
-    GfMatrix4d ComputeManipulatorToWorldTransform(const Viewport &viewport);
+    GfMatrix4d ComputeManipulatorToWorldTransform(const HydraRenderer &viewport);
     SelectedAxis _selectedAxis;
 
     UsdGeomXformCommonAPI _xformAPI;

@@ -3,7 +3,7 @@
 #include "VariantEditor.h"
 #include "Gui.h"
 #include "Constants.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "ProxyHelpers.h"
 #include "ImGuiHelpers.h"
 

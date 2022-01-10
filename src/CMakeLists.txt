@@ -3,22 +3,21 @@ subdirs(3rdparty)
 add_library(
   usdtweak_lib
   Constants.h
-  Editor.cpp
-  Editor.h
   Gui.h
   ProxyHelpers.h
   Dockspace.cpp
-  commands/Commands.cpp
-  commands/Commands.h
-  commands/Shortcuts.h
-  commands/SdfCommandGroup.cpp
-  commands/SdfCommandGroup.h
-  commands/SdfLayerInstructions.cpp
-  commands/SdfLayerInstructions.h
-  commands/SdfUndoRecorder.cpp
-  commands/SdfUndoRecorder.h
-  commands/UndoLayerStateDelegate.cpp
-  commands/UndoLayerStateDelegate.h
+  stage/StageLoader.cpp
+  stage/commands/Commands.cpp
+  stage/commands/Commands.h
+  stage/commands/Shortcuts.h
+  stage/commands/SdfCommandGroup.cpp
+  stage/commands/SdfCommandGroup.h
+  stage/commands/SdfLayerInstructions.cpp
+  stage/commands/SdfLayerInstructions.h
+  stage/commands/SdfUndoRecorder.cpp
+  stage/commands/SdfUndoRecorder.h
+  stage/commands/UndoLayerStateDelegate.cpp
+  stage/commands/UndoLayerStateDelegate.h
   viewport/GridVert.cpp
   viewport/GridFrag.cpp
   viewport/Selection.cpp

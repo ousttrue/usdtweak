@@ -1,6 +1,6 @@
 #include <functional>
 #include <vector>
-#include "commands/Commands.h"
+#include "Commands.h"
 #include "SdfCommandGroup.h"
 #include "SdfUndoRecorder.h"
 #include "UndoLayerStateDelegate.h"

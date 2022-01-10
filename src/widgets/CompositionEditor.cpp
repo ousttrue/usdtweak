@@ -7,7 +7,7 @@
 #include "ProxyHelpers.h"
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "Constants.h"
 #include "ImGuiHelpers.h"
 

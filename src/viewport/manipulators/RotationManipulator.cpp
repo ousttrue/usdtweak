@@ -8,7 +8,7 @@
 #include "GeometricFunctions.h"
 #include "viewport/Viewport.h"
 #include "Gui.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "GlslCode.h"
 
 static constexpr GLfloat axisSize = 1.2f;
@@ -161,7 +161,7 @@ static bool IntersectsUnitCircle(const GfVec3d &planeNormal3d, const GfVec3d &pl
     return false;
 }
 
-bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
+bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &viewport) {
 
     if (_xformAPI) {
         const GfVec2d mousePosition = viewport.GetMousePosition();
@@ -191,13 +191,13 @@ bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Vi
     return false;
 }
 
-void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     // TODO: we should set here if the new selection will be editable or not
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
 
-GfMatrix4d RotationManipulator::ComputeManipulatorToWorldTransform(const Viewport &viewport) {
+GfMatrix4d RotationManipulator::ComputeManipulatorToWorldTransform(const HydraRenderer &viewport) {
     if (_xformAPI) {
         const auto currentTime = GetViewportTimeCode(viewport);
         GfVec3d translation;
@@ -223,7 +223,7 @@ GfMatrix4d RotationManipulator::ComputeManipulatorToWorldTransform(const Viewpor
     return GfMatrix4d(1.0);
 }
 
-void RotationManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Viewport &viewport) {
+void RotationManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &viewport) {
 
     if (_xformAPI) {
         const auto &camera = viewport.GetCurrentCamera();
@@ -269,7 +269,7 @@ void RotationManipulator::OnDrawFrame(const pxr::UsdStageRefPtr &stage, const Vi
 }
 
 // TODO: find a more meaningful function name
-GfVec3d RotationManipulator::ComputeClockHandVector(Viewport &viewport) {
+GfVec3d RotationManipulator::ComputeClockHandVector(HydraRenderer &viewport) {
 
     const GfPlane plane(_planeNormal3d, _planeOrigin3d);
     double distance = 0.0;
@@ -285,7 +285,7 @@ GfVec3d RotationManipulator::ComputeClockHandVector(Viewport &viewport) {
     return GfVec3d();
 }
 
-void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewport &viewport) {
+void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &viewport) {
     if (_xformAPI) {
 
         const auto manipulatorCoordinates = ComputeManipulatorToWorldTransform(viewport);
@@ -317,7 +317,7 @@ void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Viewp
     BeginEdition(stage);
 }
 
-Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
     }
@@ -370,10 +370,10 @@ Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Sel
     return this;
 };
 
-void RotationManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, Viewport &) { EndEdition(); }
+void RotationManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) { EndEdition(); }
 
 // TODO code should be shared with position manipulator
-UsdTimeCode RotationManipulator::GetEditionTimeCode(const Viewport &viewport) {
+UsdTimeCode RotationManipulator::GetEditionTimeCode(const HydraRenderer &viewport) {
     std::vector<double> timeSamples; // TODO: is there a faster way to know it the xformable has timesamples ?
     const auto xformable = UsdGeomXformable(_xformAPI.GetPrim());
     xformable.GetTimeSamples(&timeSamples);
@@ -384,4 +384,4 @@ UsdTimeCode RotationManipulator::GetEditionTimeCode(const Viewport &viewport) {
     }
 }
 
-UsdTimeCode RotationManipulator::GetViewportTimeCode(const Viewport &viewport) { return viewport.GetCurrentTimeCode(); }
+UsdTimeCode RotationManipulator::GetViewportTimeCode(const HydraRenderer &viewport) { return viewport.GetCurrentTimeCode(); }

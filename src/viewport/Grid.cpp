@@ -51,7 +51,7 @@ void Grid::SetZIsUp(bool zIsUp) {
 }
 
 
-void Grid::Render(Viewport &viewport) {
+void Grid::Render(HydraRenderer &viewport) {
     const auto &camera = viewport.GetCurrentCamera();
     auto mv = camera.GetFrustum().ComputeViewMatrix();
     auto proj = camera.GetFrustum().ComputeProjectionMatrix();

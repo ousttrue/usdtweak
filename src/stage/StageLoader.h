@@ -5,20 +5,18 @@
 #include "viewport/Viewport.h"
 #include <set>
 
-using StageChangedFunc = std::function<void(UsdStageRefPtr stage)>;
-
 /// Editor contains the data shared between widgets, like selections, stages, etc etc
-class Editor {
+class StageLoader {
 
   public:
-    Editor();
-    ~Editor();
+    StageLoader();
+    ~StageLoader();
 
     /// Removing the copy constructors as we want to make sure there are no unwanted copies of the
     /// editor. There should be only one editor for now but we want to control the construction
     /// and destruction of the editor to delete properly the contexts, so it's not a singleton
-    Editor(const Editor &) = delete;
-    Editor &operator=(const Editor &) = delete;
+    StageLoader(const StageLoader &) = delete;
+    StageLoader &operator=(const StageLoader &) = delete;
 
     /// Sets the current edited layer
     void SetCurrentLayer(SdfLayerRefPtr layer);

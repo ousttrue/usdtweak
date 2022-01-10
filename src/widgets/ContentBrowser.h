@@ -1,6 +1,6 @@
 #pragma once
 /// ContentBrowser draws the stages and layers
 
-#include "Editor.h"
+#include "stage/StageLoader.h"
 
-void DrawContentBrowser(Editor &editor);
+void DrawContentBrowser(StageLoader &editor);

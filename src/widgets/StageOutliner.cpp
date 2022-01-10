@@ -6,7 +6,7 @@
 #include "Gui.h"
 #include "ImGuiHelpers.h"
 #include "StageOutliner.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "ValueEditor.h"
 #include "Constants.h"
 

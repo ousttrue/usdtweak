@@ -1,6 +1,6 @@
 #include "Dockspace.h"
-#include "Editor.h"
-#include "commands/Commands.h"
+#include "stage/StageLoader.h"
+#include "stage/commands/Commands.h"
 #include "Constants.h"
 #include "CommandLineOptions.h"
 #include "window.h"
@@ -37,7 +37,7 @@ class Python {
 /// Modal dialog used to create a new layer
 struct CreateUsdFileModalDialog : public ModalDialog {
 
-    CreateUsdFileModalDialog(Editor &editor) : editor(editor), createStage(true) { ResetFileBrowserFilePath(); };
+    CreateUsdFileModalDialog(StageLoader &editor) : editor(editor), createStage(true) { ResetFileBrowserFilePath(); };
 
     void Draw() override {
         DrawFileBrowser();
@@ -65,7 +65,7 @@ struct CreateUsdFileModalDialog : public ModalDialog {
     }
 
     const char *DialogId() const override { return "Create usd file"; }
-    Editor &editor;
+    StageLoader &editor;
     bool createStage = true;
 };
 
@@ -81,7 +81,7 @@ static const std::vector<std::string> GetUsdValidExtensions() {
 /// Modal dialog to open a layer
 struct OpenUsdFileModalDialog : public ModalDialog {
 
-    OpenUsdFileModalDialog(Editor &editor) : editor(editor) { SetValidExtensions(GetUsdValidExtensions()); };
+    OpenUsdFileModalDialog(StageLoader &editor) : editor(editor) { SetValidExtensions(GetUsdValidExtensions()); };
     ~OpenUsdFileModalDialog() override {}
     void Draw() override {
         DrawFileBrowser();
@@ -109,14 +109,14 @@ struct OpenUsdFileModalDialog : public ModalDialog {
     }
 
     const char *DialogId() const override { return "Open layer"; }
-    Editor &editor;
+    StageLoader &editor;
     bool openAsStage = true;
     bool openLoaded = true;
 };
 
 struct SaveLayerAs : public ModalDialog {
 
-    SaveLayerAs(Editor &editor) : editor(editor){};
+    SaveLayerAs(StageLoader &editor) : editor(editor){};
     ~SaveLayerAs() override {}
     void Draw() override {
         DrawFileBrowser();
@@ -135,11 +135,11 @@ struct SaveLayerAs : public ModalDialog {
     }
 
     const char *DialogId() const override { return "Save layer as"; }
-    Editor &editor;
+    StageLoader &editor;
 };
 
 // setup docks
-void Setup(Dockspace *dockspace, Editor *editor, Viewport *viewport) {
+void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
     auto &_docks = dockspace->Docks();
 
     _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [editor, viewport](bool *p_open) {
@@ -272,8 +272,8 @@ int main(int argc, const char **argv) {
 
     { // Scope as the editor should be deleted before imgui and glfw, to release correctly the memory
         // Resource will load the font/textures/settings
-        Editor editor;
-        Viewport viewport;
+        StageLoader editor;
+        HydraRenderer viewport;
 
         Setup(&dockspace, &editor, &viewport);
 

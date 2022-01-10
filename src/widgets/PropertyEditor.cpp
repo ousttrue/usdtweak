@@ -9,7 +9,7 @@
 #include "PropertyEditor.h"
 #include "ValueEditor.h"
 #include "Constants.h"
-#include "commands/Commands.h"
+#include "stage/commands/Commands.h"
 #include "ModalDialogs.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE

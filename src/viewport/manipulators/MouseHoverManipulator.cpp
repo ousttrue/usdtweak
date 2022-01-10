@@ -3,7 +3,7 @@
 #include "viewport/Viewport.h"
 #include <imgui.h>
 
-Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, Viewport &viewport) {
+Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
     ImGuiIO &io = ImGui::GetIO();
 
     if (io.KeyAlt) {
