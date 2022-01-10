@@ -10,7 +10,7 @@ class SelectionManipulator : public Manipulator {
 
     void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &) override;
 
     // Picking modes
     enum class PickMode { Prim, Model, Assembly };
@@ -19,7 +19,7 @@ class SelectionManipulator : public Manipulator {
 
   private:
     // Returns true
-    bool IsPickablePath(const class UsdStage &stage, const class SdfPath &path);
+    bool IsPickablePath(const pxr::UsdStage &stage, const pxr::SdfPath &path);
     PickMode _pickMode = PickMode::Prim;
 };
 

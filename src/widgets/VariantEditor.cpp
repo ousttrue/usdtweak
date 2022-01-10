@@ -2,7 +2,7 @@
 #include <pxr/usd/sdf/variantSetSpec.h>
 #include "VariantEditor.h"
 #include "Gui.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "stage/commands/Commands.h"
 #include "stage/ProxyHelpers.h"
 #include "ImGuiHelpers.h"

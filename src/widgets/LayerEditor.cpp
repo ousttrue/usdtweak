@@ -25,7 +25,7 @@
 #include "PrimSpecEditor.h"
 #include "CompositionEditor.h"
 #include "ImGuiHelpers.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "ValueEditor.h"
 
 struct AddSublayer : public ModalDialog {

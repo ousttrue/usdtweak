@@ -8,7 +8,7 @@
 #include "StageOutliner.h"
 #include "stage/commands/Commands.h"
 #include "ValueEditor.h"
-#include "Constants.h"
+#include <Constants.h>
 
 ///
 /// Note: ImGuiListClipper can be useful if the hierarchy is huge

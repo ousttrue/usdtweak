@@ -19,7 +19,7 @@ class PositionManipulator : public Manipulator {
     /// From ViewportEditor
     /// Note: a Manipulator does not store a viewport as it can be rendered in multiple viewport at the same time
     void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
-    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
+    Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &) override;
     void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &) override;
 
     /// Return true if the mouse is over this manipulator for the viewport passed in argument
@@ -29,7 +29,7 @@ class PositionManipulator : public Manipulator {
     void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) override;
 
     /// Called when the viewport changes its selection
-    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) override;
+    void OnSelectionChange(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &) override;
 
     typedef enum { // use class enum ??
         XAxis = 0,

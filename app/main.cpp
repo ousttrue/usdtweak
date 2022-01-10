@@ -2,7 +2,7 @@
 #include "stage/StageLoader.h"
 #include "stage/commands/Commands.h"
 #include "viewport/Viewport.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "CommandLineOptions.h"
 #include "window.h"
 //
@@ -139,6 +139,9 @@ struct SaveLayerAs : public ModalDialog {
     StageLoader &editor;
 };
 
+/// Viewport border between the panel and the window
+constexpr float ViewportBorderSize = 60.f;
+
 // setup docks
 void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
     auto &_docks = dockspace->Docks();
@@ -146,7 +149,8 @@ void Setup(Dockspace *dockspace, StageLoader *editor, HydraRenderer *viewport) {
     _docks.push_back(Dock("Stage viewport", &dockspace->Settings()._showViewport, [editor, viewport](bool *p_open) {
         if (ImGui::Begin("Viewport", p_open)) {
             ImVec2 wsize = ImGui::GetWindowSize();
-            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection(), static_cast<int>(wsize.x), static_cast<int>(wsize.y - ViewportBorderSize));
+            viewport->Draw(editor->GetCurrentStage(), editor->GetSelection(), static_cast<int>(wsize.x),
+                           static_cast<int>(wsize.y - ViewportBorderSize));
         }
         ImGui::End();
     }));
@@ -264,7 +268,7 @@ int main(int argc, const char **argv) {
 #endif
 
     /* Create a windowed mode window and its OpenGL context */
-    auto window = Window::create(InitialWindowWidth, InitialWindowHeight);
+    auto window = Window::create(1600, 1200);
     if (!window) {
         return 1;
     }

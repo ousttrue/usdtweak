@@ -87,7 +87,17 @@ target_link_libraries(
             usd_work.lib)
 target_link_directories(usd INTERFACE "$<$<CONFIG:Debug>:${DEBUG_DIR}/lib>"
                         "$<$<CONFIG:Release>:${RELEASE_DIR}/lib>")
-target_compile_definitions(usd INTERFACE /wd4244)
+# Remove warnings coming from usd and enable default multithreaded compilation
+# on windows
+target_compile_options(
+  usd
+  INTERFACE $<$<CXX_COMPILER_ID:MSVC>:/MP
+            /wd4244
+            /wd4305
+            /wd4996
+            /wd4506
+            /wd4275>
+            $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)
 
 # usdtweak
 subdirs(src app)

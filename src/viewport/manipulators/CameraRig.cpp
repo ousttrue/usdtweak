@@ -4,7 +4,7 @@
 #include <pxr/base/gf/bbox3d.h>
 #include <pxr/base/gf/frustum.h>
 #include "CameraRig.h"
-#include "Constants.h"
+#include "GeometricFunctions.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

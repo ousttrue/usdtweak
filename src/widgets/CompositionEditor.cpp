@@ -8,7 +8,7 @@
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "stage/commands/Commands.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "ImGuiHelpers.h"
 
 // 2 local struct to differentiate Inherit and Specialize which have the same underlying type

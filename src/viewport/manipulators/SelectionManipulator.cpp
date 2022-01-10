@@ -1,10 +1,11 @@
+#include "SelectionManipulator.h"
 #include <pxr/usd/kind/registry.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/prim.h>
-#include "viewport/Viewport.h"
-#include "SelectionManipulator.h"
-#include "Gui.h"
-#include "imgui.h"
+#include "Viewport.h"
+#include <Selection.h>
+#include <SensEvts.h>
+#include <imgui.h>
 
 bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &path) {
     auto prim = stage.GetPrimAtPath(path);
@@ -33,10 +34,10 @@ bool SelectionManipulator::IsPickablePath(const UsdStage &stage, const SdfPath &
     return false;
 }
 
-Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+Manipulator *SelectionManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
     auto mousePosition = viewport.GetMousePosition();
-    SdfPath outHitPrimPath;
-    SdfPath outHitInstancerPath;
+    pxr::SdfPath outHitPrimPath;
+    pxr::SdfPath outHitInstancerPath;
     int outHitInstanceIndex = 0;
     viewport.TestIntersection(stage, mousePosition, outHitPrimPath, outHitInstancerPath, outHitInstanceIndex);
     if (!outHitPrimPath.IsEmpty()) {

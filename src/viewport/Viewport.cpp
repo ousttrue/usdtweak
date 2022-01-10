@@ -1,4 +1,6 @@
-#include <iostream>
+#include "Viewport.h"
+#include <Constants.h>
+#include <Selection.h>
 
 #include <pxr/imaging/garch/glApi.h>
 #include <pxr/usd/usd/primRange.h>
@@ -7,11 +9,18 @@
 #include <pxr/usd/usdGeom/metrics.h>
 #include <pxr/usd/usdGeom/bboxCache.h>
 #include <pxr/usd/usdGeom/imageable.h>
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <IconsFontAwesome5.h>
 
-#include "Gui.h"
-#include "Viewport.h"
-#include "Constants.h"
-#include "widgets/RendererSettings.h"
+#include <iostream>
+
+// #include "widgets/RendererSettings.h"
+/// Size of the main window when it opens.
+constexpr int InitialWindowWidth = 1600;
+constexpr int InitialWindowHeight = 1200;
+/// Viewport border between the panel and the window
+constexpr float ViewportBorderSize = 60.f;
 
 // TODO: picking meshes: https://groups.google.com/g/usd-interest/c/P2CynIu7MYY/m/UNPIKzmMBwAJ
 
@@ -155,7 +164,7 @@ HydraRenderer::~HydraRenderer() {
 }
 
 /// Draw the viewport widget
-void HydraRenderer::Draw(UsdStageRefPtr stage, Selection &selection, int w, int h) {
+void HydraRenderer::Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h) {
     Render(stage, selection, w, h);
 
     ImVec2 wsize = ImGui::GetWindowSize();
@@ -181,20 +190,20 @@ void HydraRenderer::Draw(UsdStageRefPtr stage, Selection &selection, int w, int 
         DrawBasicShadingProperties(_material);
         ImGui::EndPopup();
     }
-    ImGui::SameLine();
-    ImGui::Button("\xef\x93\xbe Renderer");
-    if (_renderer && ImGui::BeginPopupContextItem(nullptr, flags)) {
-        DrawRendererSettings(*_renderer, *_renderparams);
-        DrawAovSettings(*_renderer);
-        DrawColorCorrection(*_renderer, *_renderparams);
-        ImGui::EndPopup();
-    }
-    ImGui::SameLine();
-    ImGui::Button("\xef\x89\xac Viewport");
-    if (_renderer && ImGui::BeginPopupContextItem(nullptr, flags)) {
-        DrawOpenGLSettings(*_renderer, *_renderparams);
-        ImGui::EndPopup();
-    }
+    // ImGui::SameLine();
+    // ImGui::Button("\xef\x93\xbe Renderer");
+    // if (_renderer && ImGui::BeginPopupContextItem(nullptr, flags)) {
+    //     DrawRendererSettings(*_renderer, *_renderparams);
+    //     DrawAovSettings(*_renderer);
+    //     DrawColorCorrection(*_renderer, *_renderparams);
+    //     ImGui::EndPopup();
+    // }
+    // ImGui::SameLine();
+    // ImGui::Button("\xef\x89\xac Viewport");
+    // if (_renderer && ImGui::BeginPopupContextItem(nullptr, flags)) {
+    //     DrawOpenGLSettings(*_renderer, *_renderparams);
+    //     ImGui::EndPopup();
+    // }
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100);
     DrawPickMode(_selectionManipulator);
@@ -254,7 +263,8 @@ void HydraRenderer::DrawManipulatorToolbox(const ImVec2 &cursorPos) {
 }
 
 /// Frane the viewport using the bounding box of the selection
-void HydraRenderer::FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &selection) { // Camera manipulator ???
+void HydraRenderer::FrameSelection(const pxr::UsdStageRefPtr &stage,
+                                   const std::unique_ptr<pxr::HdSelection> &selection) { // Camera manipulator ???
     if (stage && !IsSelectionEmpty(selection)) {
         UsdGeomBBoxCache bboxcache(_renderparams->frame, UsdGeomImageable::GetOrderedPurposeTokens());
         GfBBox3d bbox;
@@ -345,7 +355,7 @@ void HydraRenderer::HandleKeyboardShortcut() {
     }
 }
 
-void HydraRenderer::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection) {
+void HydraRenderer::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection) {
 
     ImGuiContext *g = ImGui::GetCurrentContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -385,7 +395,9 @@ void HydraRenderer::HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, S
 
 GfCamera &HydraRenderer::GetCurrentCamera() { return *_renderCamera; }
 const GfCamera &HydraRenderer::GetCurrentCamera() const { return *_renderCamera; }
-UsdGeomCamera HydraRenderer::GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage) { return UsdGeomCamera::Get(stage, GetCameraPath()); }
+UsdGeomCamera HydraRenderer::GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage) {
+    return UsdGeomCamera::Get(stage, GetCameraPath());
+}
 
 void HydraRenderer::SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath) {
     _selectedCameraPath = cameraPath;
@@ -473,7 +485,9 @@ void HydraRenderer::Update(UsdStageRefPtr stage, Selection &selection) {
             _renderers[stage] = _renderer;
             _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
             _grid.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
-            InitializeRendererAov(*_renderer);
+
+            // TODO:
+            // InitializeRendererAov(*_renderer);            
         } else if (whichRenderer->second != _renderer) {
             _renderer = whichRenderer->second;
             _cameraManipulator.SetZIsUp(UsdGeomGetStageUpAxis(stage) == "Z");
@@ -513,7 +527,7 @@ void HydraRenderer::Update(UsdStageRefPtr stage, Selection &selection) {
 }
 
 bool HydraRenderer::TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
-                                SdfPath &outHitInstancerPath, int &outHitInstanceIndex) {
+                                     SdfPath &outHitInstancerPath, int &outHitInstanceIndex) {
 
     GfVec2i renderSize = _drawTarget->GetSize();
     double width = static_cast<double>(renderSize[0]);

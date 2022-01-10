@@ -21,7 +21,7 @@
 #include "ModalDialogs.h"
 #include "FileBrowser.h"
 #include "stage/commands/Commands.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "ValueEditor.h"
 #include "LayerEditor.h"
 #include "VariantEditor.h"

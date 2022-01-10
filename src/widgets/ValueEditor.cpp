@@ -2,7 +2,7 @@
 #include <sstream>
 
 #include "ValueEditor.h"
-#include "Constants.h"
+#include <Constants.h>
 #include <pxr/base/gf/vec3f.h>
 #include <pxr/base/gf/vec3d.h>
 #include <pxr/base/gf/vec3i.h>

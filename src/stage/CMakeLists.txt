@@ -14,6 +14,6 @@ add_library(
   commands/SdfUndoRecorder.h
   commands/UndoLayerStateDelegate.cpp
   commands/UndoLayerStateDelegate.h)
-target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(${TARGET_NAME} PRIVATE /wd4244 /wd4305)
+target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(${TARGET_NAME} PRIVATE)
 target_link_libraries(${TARGET_NAME} PUBLIC usd)

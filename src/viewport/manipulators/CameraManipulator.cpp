@@ -1,7 +1,7 @@
 #include "CameraManipulator.h"
-#include "viewport/Viewport.h"
+#include "Viewport.h"
 #include <pxr/usd/usdGeom/camera.h>
-#include "stage/commands/Commands.h"
+#include <commands/Commands.h>
 #include <imgui.h>
 
 CameraManipulator::CameraManipulator(const GfVec2i &viewportSize, bool isZUp) : CameraRig(viewportSize, isZUp) {}
@@ -19,7 +19,7 @@ void CameraManipulator::OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRend
     }
 }
 
-Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+Manipulator *CameraManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
     auto &cameraManipulator = viewport.GetCameraManipulator();
     ImGuiIO &io = ImGui::GetIO();
 

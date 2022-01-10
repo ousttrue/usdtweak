@@ -1,34 +1,9 @@
-subdirs(3rdparty stage)
+subdirs(3rdparty stage viewport)
 
 add_library(
   usdtweak_lib
-  Constants.h
   Gui.h
   Dockspace.cpp
-  viewport/GridVert.cpp
-  viewport/GridFrag.cpp
-  viewport/Grid.cpp
-  viewport/Grid.h
-  viewport/manipulators/CameraRig.cpp
-  viewport/manipulators/CameraRig.h
-  viewport/manipulators/ManipulatorVert.cpp
-  viewport/manipulators/ManipulatorFrag.cpp
-  viewport/manipulators/CameraManipulator.cpp
-  viewport/manipulators/CameraManipulator.h
-  viewport/manipulators/Manipulator.cpp
-  viewport/manipulators/Manipulator.h
-  viewport/manipulators/MouseHoverManipulator.cpp
-  viewport/manipulators/MouseHoverManipulator.h
-  viewport/manipulators/PositionManipulator.cpp
-  viewport/manipulators/PositionManipulator.h
-  viewport/manipulators/RotationManipulator.cpp
-  viewport/manipulators/RotationManipulator.h
-  viewport/manipulators/ScaleManipulator.cpp
-  viewport/manipulators/ScaleManipulator.h
-  viewport/manipulators/SelectionManipulator.cpp
-  viewport/manipulators/SelectionManipulator.h
-  viewport/Viewport.cpp
-  viewport/Viewport.h
   widgets/TextEditor.cpp
   widgets/TextEditor.h
   widgets/CompositionEditor.cpp
@@ -60,17 +35,5 @@ add_library(
   widgets/VariantEditor.cpp
   widgets/VariantEditor.h)
 target_include_directories(usdtweak_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(usdtweak_lib PUBLIC imgui usd usdtweak_stage filesystem fontawesome
+target_link_libraries(usdtweak_lib PUBLIC imgui usd usdtweak_stage usdtweak_hydra filesystem fontawesome
                                           iconfontcppheaders)
-
-# Remove warnings coming from usd and enable default multithreaded compilation
-# on windows
-target_compile_options(
-  usdtweak_lib
-  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP
-          /wd4244
-          /wd4305
-          /wd4996
-          /wd4506
-          /wd4275>
-          $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated>)

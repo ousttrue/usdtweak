@@ -1,12 +1,12 @@
 #include <iostream>
 #include <pxr/base/gf/matrix4f.h>
 #include <pxr/imaging/garch/glApi.h>
-#include "Constants.h"
+#include <Selection.h>
 #include "ScaleManipulator.h"
 #include "GeometricFunctions.h"
-#include "viewport/Viewport.h"
+#include "Viewport.h"
 #include <imgui.h>
-#include "stage/commands/Commands.h"
+#include <commands/Commands.h>
 #include "GlslCode.h"
 
 /*
@@ -147,7 +147,7 @@ bool ScaleManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Hydra
 }
 
 // Same as rotation manipulator now -- TODO : share in a common class
-void ScaleManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+void ScaleManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
 }
@@ -235,7 +235,7 @@ void ScaleManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRen
     BeginEdition(stage);
 }
 
-Manipulator *ScaleManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+Manipulator *ScaleManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
 
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();

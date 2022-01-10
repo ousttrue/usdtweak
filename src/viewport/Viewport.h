@@ -12,7 +12,7 @@
 #include "manipulators/SelectionManipulator.h"
 #include "manipulators/RotationManipulator.h"
 #include "manipulators/ScaleManipulator.h"
-#include "stage/Selection.h"
+// #include "stage/Selection.h"
 #include "Grid.h"
 #include <pxr/imaging/glf/drawTarget.h>
 #include <pxr/usd/usd/stage.h>
@@ -39,7 +39,7 @@ class HydraRenderer final {
     HydraRenderer &operator=(const HydraRenderer &) = delete;
 
     /// Draw the full widget
-    void Draw(UsdStageRefPtr stage, Selection &selection, int w, int h);
+    void Draw(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h);
 
     /// Returns the time code of this viewport
     UsdTimeCode GetCurrentTimeCode() const { return _renderparams ? _renderparams->frame : UsdTimeCode::Default(); }
@@ -47,15 +47,15 @@ class HydraRenderer final {
 
   private:
     /// Render hydra
-    void Render(UsdStageRefPtr stage, Selection &selection, int w, int h);
+    void Render(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection, int w, int h);
 
     /// Update internal data: selection, current renderer
-    void Update(UsdStageRefPtr stage, Selection &selection);
+    void Update(UsdStageRefPtr stage, std::unique_ptr<pxr::HdSelection> &selection);
 
     void DrawCameraList(UsdStageRefPtr stage);
 
     /// Camera framing
-    void FrameSelection(const pxr::UsdStageRefPtr &stage, const Selection &);
+    void FrameSelection(const pxr::UsdStageRefPtr &stage, const std::unique_ptr<pxr::HdSelection> &);
     void FrameRootPrim(UsdStageRefPtr stage);
 
     // Cameras
@@ -64,16 +64,16 @@ class HydraRenderer final {
     const GfCamera &GetCurrentCamera() const;
 
     // Set the camera path
-    void SetCameraPath(const pxr::UsdStageRefPtr &stage, const SdfPath &cameraPath);
-    const SdfPath &GetCameraPath() { return _selectedCameraPath; }
+    void SetCameraPath(const pxr::UsdStageRefPtr &stage, const pxr::SdfPath &cameraPath);
+    const pxr::SdfPath &GetCameraPath() { return _selectedCameraPath; }
     // Returns a UsdGeom camera if the selected camera is in the stage
     UsdGeomCamera GetUsdGeomCamera(const pxr::UsdStageRefPtr &stage);
 
     CameraManipulator &GetCameraManipulator() { return _cameraManipulator; }
 
     // Picking
-    bool TestIntersection(const pxr::UsdStageRefPtr &stage, GfVec2d clickedPoint, SdfPath &outHitPrimPath,
-                          SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
+    bool TestIntersection(const pxr::UsdStageRefPtr &stage, pxr::GfVec2d clickedPoint, pxr::SdfPath &outHitPrimPath,
+                          pxr::SdfPath &outHitInstancerPath, int &outHitInstanceIndex);
     GfVec2d GetPickingBoundarySize() const;
 
     // Utility function for compute a scale for the manipulators. It uses the distance between the camera
@@ -104,7 +104,7 @@ class HydraRenderer final {
 
     /// Handle events is implemented as a finite state machine.
     /// The state are simply the current manipulator used.
-    void HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, Selection &selection);
+    void HandleManipulationEvents(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection);
     void HandleKeyboardShortcut();
 
   private:
@@ -123,10 +123,10 @@ class HydraRenderer final {
     ScaleManipulator _scaleManipulator;
     SelectionManipulator _selectionManipulator;
 
-    SelectionHash _lastSelectionHash = 0;
+    size_t _lastSelectionHash = 0;
 
     /// Cameras
-    SdfPath _selectedCameraPath;
+    pxr::SdfPath _selectedCameraPath;
     GfCamera *_renderCamera; // Points to a valid camera, stage or perspective
     GfCamera _stageCamera;
     // TODO: if we want to have multiple viewport, the persp camera shouldn't belong to the viewport but

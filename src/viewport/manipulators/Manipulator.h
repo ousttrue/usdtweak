@@ -1,7 +1,6 @@
 #pragma once
-#include "stage/Selection.h"
 #include <pxr/usd/usd/common.h>
-
+#include <pxr/imaging/hd/selection.h>
 class HydraRenderer;
 
 /// Base class for a manipulator.
@@ -14,9 +13,10 @@ class HydraRenderer;
 
 struct Manipulator {
     virtual ~Manipulator(){};
-    virtual void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){};     // Enter State
-    virtual void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){};       // Exit State
-    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &) = 0; // Next State
+    virtual void OnBeginEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){}; // Enter State
+    virtual void OnEndEdition(const pxr::UsdStageRefPtr &stage, HydraRenderer &){};   // Exit State
+    virtual Manipulator *OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection,
+                                  HydraRenderer &) = 0; // Next State
 
     virtual bool IsMouseOver(const pxr::UsdStageRefPtr &stage, const HydraRenderer &) { return false; };
 
@@ -24,5 +24,6 @@ struct Manipulator {
     virtual void OnDrawFrame(const pxr::UsdStageRefPtr &stage, const HydraRenderer &){};
 
     /// Called when the viewport changes its selection
-    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &){};
+    virtual void OnSelectionChange(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection,
+                                   HydraRenderer &){};
 };

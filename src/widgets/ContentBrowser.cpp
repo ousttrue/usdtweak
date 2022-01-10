@@ -8,7 +8,7 @@
 #include "ContentBrowser.h"
 #include "LayerEditor.h" // for DrawLayerMenuItems
 #include "stage/commands/Commands.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "TextFilter.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE

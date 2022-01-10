@@ -5,6 +5,9 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+/// PI
+constexpr float PI_F = 3.14159265;
+
 /// Check if all components of v1 and v2 have the same signs
 inline bool SameSign(const GfVec2d &v1, const GfVec2d &v2) { return v1[0] * v2[0] >= 0.0 && v1[1] * v2[1] >= 0.0; }
 

@@ -2,13 +2,12 @@
 #include <vector>
 #include <pxr/base/gf/line.h>
 #include <pxr/imaging/garch/glApi.h>
-
-#include "Constants.h"
+#include <Selection.h>
 #include "RotationManipulator.h"
 #include "GeometricFunctions.h"
-#include "viewport/Viewport.h"
-#include "Gui.h"
-#include "stage/commands/Commands.h"
+#include "Viewport.h"
+#include <imgui.h>
+#include <commands/Commands.h>
 #include "GlslCode.h"
 
 static constexpr GLfloat axisSize = 1.2f;
@@ -191,7 +190,7 @@ bool RotationManipulator::IsMouseOver(const pxr::UsdStageRefPtr &stage, const Hy
     return false;
 }
 
-void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+void RotationManipulator::OnSelectionChange(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
     // TODO: we should set here if the new selection will be editable or not
     auto primPath = GetSelectedPath(selection);
     _xformAPI = UsdGeomXformCommonAPI(stage->GetPrimAtPath(primPath));
@@ -317,7 +316,7 @@ void RotationManipulator::OnBeginEdition(const pxr::UsdStageRefPtr &stage, Hydra
     BeginEdition(stage);
 }
 
-Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+Manipulator *RotationManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection, HydraRenderer &viewport) {
     if (ImGui::IsMouseReleased(0)) {
         return viewport.GetManipulator<MouseHoverManipulator>();
     }

@@ -8,7 +8,7 @@
 #include "Gui.h"
 #include "PropertyEditor.h"
 #include "ValueEditor.h"
-#include "Constants.h"
+#include <Constants.h>
 #include "stage/commands/Commands.h"
 #include "ModalDialogs.h"
 

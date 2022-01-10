@@ -8,14 +8,12 @@
 // https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/demo/opengl/shader/InfinitePlaneDemo.java
 // https://github.com/martin-pr/possumwood/wiki/Infinite-ground-plane-using-GLSL-shaders
 //
+#include "Grid.h"
 #include <iostream>
 #include <pxr/imaging/garch/glApi.h>
 #include <pxr/base/gf/matrix4f.h>
 #include <pxr/base/gf/line.h>
-#include "Grid.h"
-#include "Constants.h" // error codes
 #include "Viewport.h"
-#include "Gui.h"
 #include "manipulators/GlslCode.h"
 
 // In the viewing volume, the xy plane clipped at 1, this covers the full view area

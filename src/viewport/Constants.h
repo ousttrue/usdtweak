@@ -3,16 +3,6 @@
 /// Constants used in the application
 ///
 
-/// PI
-constexpr float PI_F = 3.14159265;
-
-/// Size of the main window when it opens.
-constexpr int InitialWindowWidth = 1600;
-constexpr int InitialWindowHeight = 1200;
-
-/// Viewport border between the panel and the window
-constexpr float ViewportBorderSize = 60.f;
-
 /// Height of a row in the property editor
 constexpr float TableRowHeight = 22.f;
 
@@ -40,9 +30,6 @@ constexpr const char * DecimalPrecision = "%.5f";
 
 /// Default name when creating a prim
 constexpr const char *const DefaultPrimSpecName = "prim";
-
-/// Return error codes
-constexpr int ERROR_UNABLE_TO_COMPILE_SHADER = 110;
 
 constexpr const char* ICON_DELETE = "\xef\x87\xb8"; // ICON_FA_TRASH;
 

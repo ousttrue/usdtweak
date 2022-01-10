@@ -1,9 +1,10 @@
 #include "MouseHoverManipulator.h"
-#include "stage/Selection.h"
-#include "viewport/Viewport.h"
+#include "Viewport.h"
+#include <Selection.h>
 #include <imgui.h>
 
-Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, Selection &selection, HydraRenderer &viewport) {
+Manipulator *MouseHoverManipulator::OnUpdate(const pxr::UsdStageRefPtr &stage, std::unique_ptr<pxr::HdSelection> &selection,
+                                             HydraRenderer &viewport) {
     ImGuiIO &io = ImGui::GetIO();
 
     if (io.KeyAlt) {
