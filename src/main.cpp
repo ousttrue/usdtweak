@@ -123,9 +123,9 @@ int main(int argc, char *const *argv) {
     std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "USD " << PXR_VERSION << std::endl;
 
-#if (__APPLE__ && PXR_VERSION < 2208)
-    std::cout << "Viewport is disabled on Apple platform with USD < 22.08" << std::endl;
-#endif
+// #if (__APPLE__ && PXR_VERSION < 2208)
+//     std::cout << "Viewport is disabled on Apple platform with USD < 22.08" << std::endl;
+// #endif
     const char *pluginPathName = std::getenv("PXR_PLUGINPATH_NAME");
     std::cout << "PXR_PLUGINPATH_NAME: " << (pluginPathName ? pluginPathName : "") << std::endl;
 
