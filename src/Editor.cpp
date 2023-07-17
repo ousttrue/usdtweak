@@ -458,10 +458,10 @@ Viewport & Editor::GetViewport() {
 }
 
 void Editor::HydraRender() {
-#if !( __APPLE__ && PXR_VERSION < 2208)
+// #if !( __APPLE__ && PXR_VERSION < 2208)
     _viewport.Update();
     _viewport.Render();
-#endif
+// #endif
 }
 
 void Editor::ShowDialogSaveLayerAs(SdfLayerHandle layerToSaveAs) { DrawModalDialog<SaveLayerAsDialog>(*this, layerToSaveAs); }

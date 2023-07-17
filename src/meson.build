@@ -1,17 +1,95 @@
+glfw_dep = dependency('glfw3', default_options: ['install=true'])
 subdir('3rdparty')
 
-glfw_dep = dependency('glfw3')
+cpp = meson.get_compiler('cpp')
+shlwapi = cpp.find_library('Shlwapi', required: true)
 
+cdata = configuration_data()
+cdata.set('GIT_HASH', 'githash')
+cdata.set('BUILD_DATE', '202307')
+configure_file(
+    input: '../cmake/stamp.h.in',
+    output: 'stamp.h',
+    configuration: cdata,
+)
+stamp = configure_file(
+    input: '../cmake/stamp.cpp.in',
+    output: 'stamp.cpp',
+    configuration: cdata,
+)
 executable(
     'usdtweak',
     [
+        stamp,
+        'widgets/VtValueEditor.cpp',
+        'widgets/VtDictionaryEditor.cpp',
+        'widgets/VtArrayEditor.cpp',
+        'widgets/VariantEditor.cpp',
+        'widgets/UsdPrimEditor.cpp',
+        'widgets/Timeline.cpp',
+        'widgets/TextFilter.cpp',
+        'widgets/TextEditor.cpp',
+        'widgets/StageOutliner.cpp',
+        'widgets/StageLayerEditor.cpp',
+        'widgets/SdfPrimEditor.cpp',
+        'widgets/SdfLayerSceneGraphEditor.cpp',
+        'widgets/SdfLayerEditor.cpp',
+        'widgets/SdfAttributeEditor.cpp',
+        'widgets/ModalDialogs.cpp',
+        'widgets/LauncherBar.cpp',
+        'widgets/FileBrowser.cpp',
+        'widgets/Debug.cpp',
+        'widgets/ContentBrowser.cpp',
+        'widgets/ConnectionEditor.cpp',
+        'widgets/CompositionEditor.cpp',
+        'viewport/Viewport.cpp',
+        'viewport/SelectionManipulator.cpp',
+        'viewport/ScaleManipulator.cpp',
+        'viewport/RotationManipulator.cpp',
+        'viewport/PositionManipulator.cpp',
+        'viewport/Playblast.cpp',
+        'viewport/MouseHoverManipulator.cpp',
+        'viewport/Manipulator.cpp',
+        'viewport/ImagingSettings.cpp',
+        'viewport/Grid.cpp',
+        'viewport/CameraRig.cpp',
+        'viewport/CameraManipulator.cpp',
+        'UsdHelpers.cpp',
+        'Selection.cpp',
+        'resources/ResourcesLoader.cpp',
         'main.cpp',
+        'ImGuiHelpers.cpp',
+        'EditorSettings.cpp',
+        'Editor.cpp',
+        'Debug.cpp',
+        'commands/UndoLayerStateDelegate.cpp',
+        'commands/SdfUndoRedoRecorder.cpp',
+        'commands/SdfLayerInstructions.cpp',
+        'commands/SdfCommandGroupRecorder.cpp',
+        'commands/SdfCommandGroup.cpp',
+        'commands/PrimCommands.cpp',
+        'commands/LayerCommands.cpp',
+        'commands/EditorCommands.cpp',
+        'commands/CommandStack.cpp',
+        'commands/CommandsImpl.cpp',
+        'commands/AttributeCommands.cpp',
+        'CommandLineOptions.cpp',
+        'Blueprints.cpp',
     ],
     install: true,
     include_directories: include_directories(
         'viewport',
         'commands',
         'resources',
+        'widgets',
     ),
-    dependencies: [usd_dep, glfw_dep, imgui_dep, third_dep],
+    dependencies: [
+        shlwapi,
+        usd_dep,
+        usd_imaging_dep,
+        usd_usdImaging_dep,
+        glfw_dep,
+        imgui_dep,
+        third_dep,
+    ],
 )

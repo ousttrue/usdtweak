@@ -1,23 +1,23 @@
 #include "Debug.h"
 
-#include <iostream>
-#include <array>
-#include <utility>
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
+#include <array>
+#include <iostream>
+#include <utility>
 
 void DrawDebugInfo() {
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("Keys pressed:");
     for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
-        if (ImGui::IsKeyPressed(i)) {
+        if (ImGui::IsKeyPressed((ImGuiKey)i)) {
             ImGui::SameLine();
             ImGui::Text("%d", i);
         }
     ImGui::Text("Keys release:");
     for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
-        if (ImGui::IsKeyReleased(i)) {
+        if (ImGui::IsKeyReleased((ImGuiKey)i)) {
             ImGui::SameLine();
             ImGui::Text("%d", i);
         }
@@ -38,16 +38,17 @@ void DrawDebugInfo() {
         }
     ImGui::Text("NavInputs pressed:");
     for (int i = 0; i < IM_ARRAYSIZE(io.NavInputs); i++)
-        if (io.NavInputsDownDuration[i] == 0.0f) {
+        // if (io.NavInputsDownDuration[i] == 0.0f) 
+        {
             ImGui::SameLine();
             ImGui::Text("[%d]", i);
         }
     ImGui::Text("NavInputs duration:");
     for (int i = 0; i < IM_ARRAYSIZE(io.NavInputs); i++)
-        if (io.NavInputsDownDuration[i] >= 0.0f) {
-            ImGui::SameLine();
-            ImGui::Text("[%d] %.2f", i, io.NavInputsDownDuration[i]);
-        }
+        // if (io.NavInputsDownDuration[i] >= 0.0f) {
+        //     ImGui::SameLine();
+        //     ImGui::Text("[%d] %.2f", i, io.NavInputsDownDuration[i]);
+        // }
     ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
     ImGui::Text("WantCaptureMouse: %d", io.WantCaptureMouse);
     ImGui::Text("WantCaptureKeyboard: %d", io.WantCaptureKeyboard);

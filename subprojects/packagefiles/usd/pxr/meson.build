@@ -8,7 +8,7 @@ pxr_version = major_version * 10000 + minor_version * 100 + patch_version
 cdata.set_quoted('PXR_MAJOR_VERSION', major_version.to_string())
 cdata.set_quoted('PXR_MINOR_VERSION', minor_version.to_string())
 cdata.set_quoted('PXR_PATCH_VERSION', patch_version.to_string())
-cdata.set_quoted('PXR_VERSION', pxr_version.to_string())
+cdata.set('PXR_VERSION', pxr_version.to_string())
 cdata.set('PXR_USE_NAMESPACES', 1)
 cdata.set('PXR_EXTERNAL_NAMESPACE', 'pxr')
 cdata.set(

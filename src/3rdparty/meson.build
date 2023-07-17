@@ -1,5 +1,11 @@
 subdir('imgui')
 
 third_dep = declare_dependency(
-    include_directories: include_directories('iconfontcppheaders'),
+    include_directories: include_directories(
+        'iconfontcppheaders',
+        'fontawesome',
+        'fonts',
+        'wildcards',
+        'filesystem',
+    ),
 )
