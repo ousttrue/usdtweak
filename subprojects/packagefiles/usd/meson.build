@@ -1,0 +1,6 @@
+project('OpenUSD', 'cpp', version: '23.05')
+add_project_arguments('-DNOMINMAX', language: 'cpp')
+boost_dep = dependency('boost')
+tbb_dep = subproject('tbb').get_variable('tbb_dep')
+pxr_inc = include_directories('.', is_system: true)
+subdir('pxr')
